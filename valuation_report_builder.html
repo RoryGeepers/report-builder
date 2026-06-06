@@ -1,8 +1,11 @@
-<html lang="en"><head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Herts Valuations — Report Builder</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&amp;family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&amp;display=swap" rel="stylesheet"/>
 <style>
   :root {
     --navy: #1a2744;
@@ -448,449 +451,475 @@
     .report-area { overflow: visible; }
     .report-scroll { padding: 0; }
     .report-page { box-shadow: none; max-width: 100%; }
+    .para-move-controls { display: none !important; }
   }
+
+  /* Hide the old position-number inputs (paragraphs reorder via arrows now) */
+  .group-order-input { display: none !important; }
+
+  /* Reorderable selected paragraph rows in the preview */
+  .report-para-row { position: relative; }
+  .report-para-row:hover { background: #fffdf5; }
+  .para-move-controls {
+    position: absolute;
+    top: 2px;
+    right: -40px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 5;
+    opacity: 0.25;
+    transition: opacity 0.15s;
+  }
+  .report-para-row:hover .para-move-controls,
+  .para-move-controls:hover { opacity: 1; }
+  .para-move-btn {
+    border: 1px solid var(--border);
+    background: var(--warm-white);
+    color: var(--navy);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    line-height: 1;
+    padding: 3px 6px;
+    font-family: inherit;
+  }
+  .para-move-btn:hover:not([disabled]) { background: var(--gold); color: white; border-color: var(--gold); }
+  .para-move-btn[disabled] { opacity: 0.3; cursor: default; }
 
   
 </style>
 </head>
 <body>
-
 <header>
-  <h1>Herts Valuations — Report Builder</h1>
-  <span>Valuation Report Composer</span>
+<h1>Herts Valuations — Report Builder</h1>
+<span>Valuation Report Composer</span>
 </header>
-
 <div style="display:grid;grid-template-columns:340px 1fr;width:100%;height:calc(100vh - 64px);">
-  <div style="overflow-y:auto;background:#f0ece3;border-right:1px solid #ddd5c4;height:100%;">
-
-
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab('details')">Client</div>
-      <div class="tab" onclick="switchTab('assets')">Assets</div>
-      <div class="tab" onclick="switchTab('paragraphs')">Paragraphs</div>
-    </div>
-
-    <!-- DETAILS TAB -->
-    <div class="tab-content active" id="tab-details">
-
-      <div class="panel-section">
-        <h3>Client / IP</h3>
-        <label>Firm</label>
-        <div class="client-row">
-          <select id="firmSelect" onchange="selectFirm()"><option value="">— choose firm —</option><option value="0">Valentine &amp; Co (London)</option><option value="1">Valentine &amp; Co (Dartford)</option><option value="2">Forvis Mazars</option><option value="3">Leading Insolvency Practitioners</option><option value="4">Oliver Elliot Insolvency Practitioners</option><option value="5">Leigh Consultancy Limited</option></select>
-          <button class="btn-sm" onclick="openAddClient()">+ Add</button>
-        </div>
-        <label>Contact</label>
-        <select id="contactSelect" onchange="selectContact()" style="margin-bottom:10px">
-          <option value="">— choose contact —</option>
-        </select>
-        <label>Salutation (Dear...)</label>
-        <input type="text" id="salutation" placeholder="" oninput="updatePreview()">
-        <label>Address (one line per row)</label>
-        <textarea id="clientAddress" rows="4" placeholder="" oninput="updatePreview()"></textarea>
-        <label>Email (if by email only)</label>
-        <input type="text" id="clientEmail" placeholder="" oninput="updatePreview()">
-      </div>
-
-      <div class="panel-section">
-        <h3>Case</h3>
-        <label>Case / Company Name</label>
-        <input type="text" id="caseName" placeholder="" oninput="updatePreview()">
-        <label>Insolvency Status</label>
-        <select id="caseStatus" onchange="updatePreview()">
-          <option value="">(none)</option>
-          <option value="in Liquidation">in Liquidation</option>
-          <option value="in Administration">in Administration</option>
-          <option value="in Bankruptcy">in Bankruptcy</option>
-        </select>
-
-        <label>Report Date</label>
-        <input type="date" id="reportDate" oninput="updatePreview()">
-        <label>Premises Address</label>
-        <input type="text" id="premisesAddress" placeholder="" oninput="updatePreview()">
-        <label>Site Attendance</label>
-        <select id="attendedSite" onchange="updatePreview()">
-          <option value="attended">Attended site</option>
-          <option value="not">Did not attend site</option>
-        </select>
-      </div>
-
-    </div>
-
-    <!-- ASSETS TAB -->
-    <div class="tab-content" id="tab-assets">
-      <div class="panel-section" style="border:none">
-        <h3>Asset Categories</h3>
-        <div class="highlight-note">Tick to add categories — rows appear below automatically</div>
-        <div id="assetCategoryChecks" style="text-align:left;display:block;margin-bottom:12px;"><label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; margin-bottom: 6px; color: var(--text); font-weight: 400; cursor: pointer; text-align: left; width: 100%; justify-content: flex-start;"><input type="checkbox" value="Office Furniture &amp; Equipment">Office Furniture &amp; Equipment</label><label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; margin-bottom: 6px; color: var(--text); font-weight: 400; cursor: pointer; text-align: left; width: 100%; justify-content: flex-start;"><input type="checkbox" value="Computer &amp; IT Equipment">Computer &amp; IT Equipment</label><label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; margin-bottom: 6px; color: var(--text); font-weight: 400; cursor: pointer; text-align: left; width: 100%; justify-content: flex-start;"><input type="checkbox" value="Fixtures &amp; Fittings">Fixtures &amp; Fittings</label><label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; margin-bottom: 6px; color: var(--text); font-weight: 400; cursor: pointer; text-align: left; width: 100%; justify-content: flex-start;"><input type="checkbox" value="Stock in Trade">Stock in Trade</label><label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; margin-bottom: 6px; color: var(--text); font-weight: 400; cursor: pointer; text-align: left; width: 100%; justify-content: flex-start;"><input type="checkbox" value="Plant &amp; Machinery">Plant &amp; Machinery</label><label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; margin-bottom: 6px; color: var(--text); font-weight: 400; cursor: pointer; text-align: left; width: 100%; justify-content: flex-start;"><input type="checkbox" value="Motor Vehicles">Motor Vehicles</label><label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; margin-bottom: 6px; color: var(--text); font-weight: 400; cursor: pointer; text-align: left; width: 100%; justify-content: flex-start;"><input type="checkbox" value="Motor Vehicles (Financed)">Motor Vehicles (Financed)</label><label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; margin-bottom: 6px; color: var(--text); font-weight: 400; cursor: pointer; text-align: left; width: 100%; justify-content: flex-start;"><input type="checkbox" value="Leasehold Interest">Leasehold Interest</label><label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; margin-bottom: 6px; color: var(--text); font-weight: 400; cursor: pointer; text-align: left; width: 100%; justify-content: flex-start;"><input type="checkbox" value="Intellectual Property">Intellectual Property</label><label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; margin-bottom: 6px; color: var(--text); font-weight: 400; cursor: pointer; text-align: left; width: 100%; justify-content: flex-start;"><input type="checkbox" value="Goodwill">Goodwill</label></div>
-        <h3>Forced Sale Valuation</h3>
-        <table class="asset-table" id="fsTable">
-          <thead><tr><th>Category</th><th>£ Value</th><th></th></tr></thead>
-          <tbody id="fsBody"></tbody>
-        </table>
-        <button class="btn-sm" onclick="addAssetRow('fs')">+ Row</button>
-
-        <h3 style="margin-top:20px">Open Market Valuation <span style="font-weight:300;font-size:0.78rem">(optional)</span></h3>
-        <label style="margin-bottom:6px"><input type="checkbox" id="includeOM" onchange="syncAssetRowsFromCats();renderAssetTables();updatePreview()"> Include Open Market valuation</label>
-        <table class="asset-table" id="omTable">
-          <thead><tr><th>Category</th><th>£ Value</th><th></th></tr></thead>
-          <tbody id="omBody"></tbody>
-        </table>
-        <button class="btn-sm" onclick="addAssetRow('om')">+ Row</button>
-      </div>
-    </div>
-
-    <!-- PARAGRAPHS TAB -->
-    <div class="tab-content" id="tab-paragraphs">
-      <div class="panel-section" style="border:none">
-        <div class="highlight-note">Give each group a number to set its position in the report. Within each group, click "Add to report" to select which paragraph to use.</div>
-        <div id="paraGroupContainer">
-        </div>
-
-        <div class="para-group" style="display:none">
-          <div class="para-group-header">
-          <div class="para-group-title" contenteditable="true" title="Click to rename this section">Site Visit</div>
-          <input type="number" class="group-order-input" min="1" max="99" placeholder="—" title="Position in report" onclick="event.stopPropagation()" oninput="updatePreview()">
-        </div>
-          <div class="para-option" data-id="open1">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Site attended</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">Further to your instructions, we have attended the premises at [ADDRESS] to carry out an inspection and valuation of the company's assets therein, comprising the asset categories chosen. In our opinion, the Forced Sale value of the assets is a figure in the region of [£INSERT], which may be apportioned as follows:</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-          </div>
-          <div class="para-option" data-id="open2">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Site not attended</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">Further to your instructions, we are pleased to set out below our valuation of the company's assets situated at [ADDRESS]. These assets comprise the asset categories chosen. In our opinion, the Forced Sale value of the assets is a figure in the region of [£INSERT], which may be apportioned as follows:</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-          </div>
-          
-
-<div class="para-group" style="display:none">
-          <div class="para-group-header">
-          <div class="para-group-title" contenteditable="true" title="Click to rename this section">Arriving at valuation</div>
-          <input type="number" class="group-order-input" min="1" max="99" placeholder="—" title="Position in report" onclick="event.stopPropagation()" oninput="updatePreview()">
-        </div>
-          <div class="para-option" data-id="arr1">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Standard</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">In arriving at our valuation, we have taken into consideration the age and condition of the assets and present market trends.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-          </div>
-          
-
-        <div class="para-group">
-          <div class="para-group-header">
-          <div class="para-group-title" contenteditable="true" title="Click to rename this section">Disclaimers (standard closing)</div>
-          <input type="number" class="group-order-input" min="1" max="99" placeholder="—" title="Position in report" onclick="event.stopPropagation()" oninput="updatePreview()">
-        </div>
-          <div class="para-option" data-id="dis1">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Safety / as-is</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">Although our valuation considers the apparent condition of the assets, neither technical survey nor safety tests have been carried out. In the event of a sale, the assets would be sold 'as is' but we have nevertheless assumed that they generally comply with relevant safety regulations to enable their resale.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-          </div>
-          <div class="para-option" data-id="dis2">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Reliance on information</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">Please note that in this report, our opinion is somewhat based on information and statements of fact provided by officers of the company, which have necessarily been relied upon by us to a certain extent. No liability or responsibility can therefore be accepted, where this information is found to be incomplete or incorrect.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-          </div>
-          <div class="para-option" data-id="dis4">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">No costs of sale / VAT</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">No costs of sale have been taken into consideration. All valuation figures are exclusive of VAT, if applicable.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-          </div>
-          <div class="para-option" data-id="dis3">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Sole use / confidentiality</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">Finally, this report is prepared for the sole use of the party to whom it is addressed and should only be used within the context of the instructions under which it is to be prepared. It may not be disclosed to others without written consent.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-            </div>
-          </div>
-
-        
-          <div class="para-option" data-id="ex2">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Third party goods excluded</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">We have excluded from our valuation certain items which belong to third parties. These are items being sold for customers, or items supplied on a sale or return basis. We are advised that all other items on site are wholly-owned by the company.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-            </div>
-          </div>
-
-        
-          <div class="para-option" data-id="cs2">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Favour in-situ sale to minimise costs</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">Given the nature of the assets, we would favour a sale in situ, to minimise costs such as transport, removal and storage. No consideration has yet been made of any associated costs of sale.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-            </div>
-          </div>
-
-        <div class="para-group">
-          <div class="para-group-header">
-          <div class="para-group-title" contenteditable="true" title="Click to rename this section">Offer / Recommendation</div>
-          <input type="number" class="group-order-input" min="1" max="99" placeholder="—" title="Position in report" onclick="event.stopPropagation()" oninput="updatePreview()">
-        </div>
-          <div class="para-option" data-id="of_rec1">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Recommend acceptance of offer received</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">We have received an offer from [NAME] in the sum of £[AMOUNT]. We would have no hesitation in recommending acceptance of the offer, especially given the likely Forced Sale value.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-          </div>
-          <div class="para-option" data-id="of_rec2">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Recommend private treaty sale</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">Given the particular circumstances of this case, we would suggest that a sale by private treaty would be the best method of realisation in relation to associated costs.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-            </div>
-          </div>
-
-
-        <div class="para-group">
-          <div class="para-group-header">
-          <div class="para-group-title" contenteditable="true" title="Click to rename this section">Forced Sale Definition</div>
-          <input type="number" class="group-order-input" min="1" max="99" placeholder="—" title="Position in report" onclick="event.stopPropagation()" oninput="updatePreview()">
-        </div>
-          <div class="para-option" data-id="fsd1">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Standard definition</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">A Forced Sale is one in which the assets are sold within a limited period of time, to one or more unconnected third parties with no special interest and does not take into consideration any element of Goodwill or Work in Progress. The physical assets are sold as a whole or individually and although sold without the benefit of any warranty or guarantee, are assumed to be in fair, working condition at the time of sale, unless otherwise stated. Such assets are sold wherever possible in situ.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-          </div>
-          <div class="para-option" data-id="fsd2">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Assumptions list (desktop / list-based valuation)</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">A Forced Sale valuation is what we would expect to achieve from a well-advertised sale in situ. This valuation assumes: a willing seller; all machines are complete, well maintained and in full working order; sufficient time to prepare sales details, advertise and conduct a sale; easy access for removal; all items are wholly owned by the company; and the list provided is accurate, as we have not had the opportunity to inspect the equipment.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-          </div>
-          <div class="para-option" data-id="fsd3">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Open Market — auction price basis (pre-pack / connected party review)</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">In this case, Open Market values are determined by estimated auction prices, if we were to arrange a well-advertised sale, or series of sales on site. For the purposes of this valuation, however, no account has been made of the cost of sale.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-          </div>
-          <div class="para-option" data-id="fsd4">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">By way of comparison — Forced Sale figure</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">By way of comparison, we would advise that the Forced Sale value of these assets would have been a figure in the region of £[X]. A forced sale assumes a disposal within a limited time period, in a private treaty sale or series of sales on site to trade dealers, or where most of the assets are removed from site for sale elsewhere.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-            </div>
-          </div>
-
-        <div class="para-group">
-          <div class="para-group-header">
-          <div class="para-group-title" contenteditable="true" title="Click to rename this section">No / Minimal Assets</div>
-          <input type="number" class="group-order-input" min="1" max="99" placeholder="—" title="Position in report" onclick="event.stopPropagation()" oninput="updatePreview()">
-        </div>
-          <div class="para-option" data-id="nil1">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Low value / suggest abandon (office furniture)</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">Unfortunately, given the location of the assets, low demand for used office furniture generally and the high costs of attending site and/or collecting the assets, we would suggest these are abandoned.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-          </div>
-          <div class="para-option" data-id="nil2">
-            <div class="para-header" onclick="expandPara(this)">
-              <span class="tick">✓</span>
-              <span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Recommend in-situ sale to maximise / minimise expenses</span>
-              <span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
-            </div>
-            <div class="para-body">
-              <div class="para-preview-text" contenteditable="true" title="Click to edit this paragraph text" style="cursor:text;outline:none;">We would recommend a sale in situ in order to maximise realisation and minimise expenses.</div>
-              <button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
-            </div>
-            </div>
-          </div>
-
-        <div class="para-group">
-          <div class="para-group-title" contenteditable="true" title="Click to rename this section">Custom paragraph</div>
-          <textarea class="custom-para-input" id="customParaText" placeholder="Type a bespoke paragraph for this case..."></textarea>
-          <button class="btn-sm" onclick="addCustomPara()">Add to Report</button>
-        </div>
-
-      </div><!-- /paraGroupContainer -->
-        <button class="btn-sm" onclick="addNewGroup()" style="margin-top:8px;width:100%;">+ Add New Group</button>
-      </div>
-    </div>
-
-  
-  <div style="overflow-y:auto;background:#fdfcf9;display:flex;flex-direction:column;height:100%;">
-
-    <div class="report-toolbar">
-      <span>Live preview — paragraphs editable in report; double-click paragraph titles in panel to rename</span>
-      <button class="btn-action btn-secondary" onclick="window.print()">🖨 Print</button>
-      <button class="btn-action btn-secondary" onclick="exportHtml()" style="background:#2a6b3c;color:white;border-color:#2a6b3c;">💾 Export &amp; Save</button>
-      <button class="btn-action btn-secondary" onclick="publishToGitHub()" style="background:#24292f;color:white;border-color:#24292f;">⬆ Publish to GitHub</button>
-      <button class="btn-action btn-primary" onclick="copyToClipboard()">📋 Copy to Word</button>
-    </div>
-    <div class="report-scroll">
-      <div class="report-page" id="reportPage">
-    <div class="report-header-block">
-      <div class="company-logo">
-        <span class="herts">HERTS</span>
-        <span class="vals">VALUATIONS</span>
-        <span class="tagline">Valuers &amp; Auctioneers</span>
-      </div>
-    </div>
-
-    <div class="report-content">
-    <div class="addressee-block"></div>
-    <div class="report-date">6th June 2026</div>
-    <div class="salutation">Dear [SALUTATION],</div>
-    <div class="case-subject">[COMPANY NAME]</div>
-
-    <div class="report-body">
-      <p contenteditable="true" class="editable-para" style="outline:none;cursor:text;">Further to your instructions, we have attended the premises at [PREMISES ADDRESS] to carry out an inspection and valuation of the company's assets therein, comprising [ASSET CATEGORIES]. In our opinion, the Forced Sale value of the assets is a figure in the region of [£INSERT], which may be apportioned as follows:</p>
-      
-      
-      <p contenteditable="true" class="editable-para" style="outline:none;cursor:text;">In arriving at our valuation, we have taken into consideration the age and condition of the assets and present market trends.</p>
-      
-      
-    </div>
-
-    <div class="report-closing">
-      <p contenteditable="true" style="outline:none;cursor:text;">I trust this is satisfactory for your present requirements.</p>
-    </div>
-    <div class="sig-block">
-      <p>Yours sincerely,</p>
-      <br>
-      <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCABhAMoDASIAAhEBAxEB/8QAHAABAAIDAQEBAAAAAAAAAAAAAAUGAQIDBwQI/8QAOhAAAQQCAQIEAwQHCAMAAAAAAQACAwQFEQYSIQcTMUFRYXEUMoGRFRYiJENSoSNCU2JygpLBCDOx/8QAGAEBAAMBAAAAAAAAAAAAAAAAAAECAwT/xAAlEQADAAEEAQMFAQAAAAAAAAAAAQIRAxIhMUEEE1EUImFxwTL/2gAMAwEAAhEDEQA/AP2WiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCErBKg+Q8hhxckdaOtYvXJQTHWrNDnkD1J2QGt+ZOkSb6K1SlZZOArKgeIcgi5Dj5LLK09SWCd9exXn11wys+806JHuD2PoVPD0Rpp4ZMtUsoLBICHsOyp3iX4hYLgVGC1mTZlfZk8uCvVi8yaQgbcQ0ewHcn2UzLp4lch0p5ZcgUUfx/K083iKmWx8vm1LcLZoX611NcNg6+ikFHK4YTyshEWChJnYRRWey9fE1W2Jutxe8RxxMG3yvPo1o9yufEs7DyHDsyMEEsAMj4nxS66o3scWOadEjsQfQqdrxkz9yd23yTKIPRFBoEREAREQBFgu0tfMb8dfVRkG6LQPGlupAREQBERAfPclZBVkmkcGMjaXOcfYD1KrHBIZbOPkztxv7zlHed39Ww/wAJnyAbo6+JK38TsrHjuH5Fr3tbLPXdFG0nu7q006/5L5+e3p8FwZ1fGnpv2GR4+gAN6mk0xh1/l31fRpWky9qXyzmvFXz4Ry8IAJsTl8q3Xl5TM2rUWv5A7y2n8RHv8VeR6KL4xjK+GwlLFVh/ZVIGQtPx6Rrf1Pr+KlAqVW6mzeFiUjnKdMJ2B9V53wOm3k/JMjzq61s0b+uhh2ubsR1WOIfIAfeR4J3/AChoU34rZGzj+DZN9MuFqeMVa5b6+ZK4Rt1+LgVNcdxdfD4SjiqjQyCpXZDGB8GtA/6VllTuXkq8VWGfRjaVbH1Y6lOCOCvG0NjjY3TWgewHsF9ax7rKoaBaSnTdrdfDnLkePxdm9M7pirxukefgANp3wQ3hZK7j4xluV3MlOOqvjnGpU36df8V4/ozfycPdfH4HFzuC+a71kyV55/G1IpzjVF2N4zXhke18oi82V7fR0jtuc78SSobwNbrwxxDyNGZssx/3yvd/2uiqzpV+1/TmmFNou5OmrmyeF8jo2yNL2+rQe4WZ3tZC9zjpoBJJ+C8R4Vla9LPUuZZCctnz0F2adgDnPMYkjFdgaPg0dvmSqaWi9RNrwW1tdaTSZ7i5wA2tDK0DZIVMdmuU5vceEw7cZB6C3lAQ4/NsLe//ACIXWLhhvDq5BnMlkye5iEpgh+nQzWx8iSo9pL/TwV+odPETn8knk+W4HGu6LuVqRyH7sQk6nn6NGyfyXwN5oLIP6LwOavD+64VfKafoZC1TGL49hsYwNx2Mp1B8Yog0n8R3UiIWhwdpRmF0sk7Neu6wVUZTmlt39hxmjVZv1tZHbvyYwj+q3MPO5TsS8drjf+HNIf8A61WoNW2vim/HSRb2m+6ZBY2vyVlgOv3cZNDvuyCq9jvzLyP6Kdas6RZ9vJrM4CIiksEREB4//wCSbpaeOwOVa0mGLJRVp/kyZ7Bv8C1qsGQkOZ8WKGN7mthKTr8g6dgzSuMcY+oaJD+KkPF3jv60+HmbwjWdUtio7yCPUSt/aYR8+poVH4LydmP5bVynKGy4n9ZsPS8h9thjaLUQe2SBxP3XnYcAfXvpdkNXorHaz/DjqWrf5PZYwAPRbriyeMtBa9pB9NFdWna4uuDsKJ4vH9z49G4kRv5FRD/oJNj+oCu/UGtB2Pqq74hYF/I+Oy0K9hta2ySOxVmc3qEU0bw9jiPcbA38iVB2HeJGXqjGy0MZx/q02fIwXftLte5ijLBonvouPb4FaYVxM5+TPdhtnTwz8RG82z3IqdTFSwUMRa+zRXHShzbJ2Q4ga7a18+xCu016rDahrTWIo5p9+VG54DpNDZ0PfQXkXh3l8b4WY+Th/LmHExQWJZKeWlZ+732PeXBzngaZKAdFrtemxsenDk8eO8WOd4eLBZC4/E4etYsSZeg50YitO6GxCKTWnuADiQNjXY/Bb3pQ9R44n5KTdbeez2l8rGtLiQAPfao/irnsRXxkGHuZalTdftwwvE0wYfKLwX736AtaRv5qv8i4x4oZDjF/jNjMcdy9O9A6u65NBLVsRscNdRawlrnfTpXmf6mZEc843W5HUmwgyLZql69YsRzzZCbpLiGkb6A8EtB7HQ7AFael9Np3mrvow9Xr6kLEI/TTy19ZwadBzdDXzXnHhxyfE8X8KoH8guR0W4ixJjbbnbPTKyUtA0O/cFp+hV74liIcDx2lhobVi1FTiETJbDg6QtHp1Eeuh2/BeY+KHBcFyfnUOGrwTVbl+B13IzxSuDAxgEbHlm+kykuADiN6afksfTKLp6eo/t7yX190LdKyybyXJMty3G5D9VOmDEwxStkysjC7zyGnba7T9700Xnt662q74P4vDR8g4w7GQtErOLi1bkc8vf1TGMMBJJ/w5ND20pfjrPFPBYOvx0ca47kBViFeLIDIugifGBprnReWS06A2ASNqJ4FCfCrI3avLmxMp5KRkkOYha414tN19mfvZja076Cf2SD7FdO5Tp1EP9fLRk9PNy7WS7+Msk0Ph5kxTmfXs2DDWjkYSHNdLKyMEEf6l08Ks/Pm+NiDJabl8bK6lkY9a6Zozrq18HDTh9VVeSchqeIXJsRxji87cjjKl2HIZfIQODoI2xOD44Q/0c9zw06HoAd+qlsiwcb8WaWSYDHS5LD9jt9v2W2oh1QvPzc3rb/tC51ONLZS57Ru0le9Pjo9Gb6LK0jdtoK3XLPKOkIiKQEREAREQBERAauGx3C+DMYjHZelJSydKvdrSffhnjD2O+oPZSKKMEOU+yp4zw74XjbUdmjxrHV5o3BzHsi7tI9CFamt03S2RTy+yUsdENHjcjFyaS+3KPdj5YAx1N7dhkgPZ7HeoBGwQd7Oj2UuG9ltpEzkJYOM9eOZhZIxr2n1DgCEggjhaGsY1rR90AaAXZFHJGEau0Gk62vO/FzE0svZ4/Dk4yKMtx1aWQO6XRPkjcI3tPs4SNYAfiQvRSFEcqwlTPYOzi7zXGGduiWnTmEEFrmn2cCAQfiFppVspMy143xgrfCuR5CHKv4nyry2ZqFnVBYb2iyEI/iM/wAw9HM9j39Cs8xq5DGcpqcxxteS3FHWdTyNaMbkdAXdTZGD3cw7PSO5Djr0VD5/kuUw439E5vi2VuZqi4T4TN4ev50Mkrful4HeIkdntO2kE9/h7XjxJJRidO0NkLGlzf5SR3H5rW1sateezNJ3mH4PlwOWoZjHx3MbbjswO7dbD6H3BHqCPge6+98UcrSHMa8H2I2Cq/luIUbN79J4+axicl/es03Bpk+T2/deP9QK+T7TzbEO1PTpZ+u0/wDsrO+zzgfNjj0OP0cPosHppvMs0m6XFItNWpXrM6IIY4mb30saGj8gq14qYqzlOHXRRLW3qobbqOI9JYiHt/PWvxXJ/iHhKum5mHJYZ/uLtN7Wj6vaCz+qjM54o8YkhfSwMsvIslMwiGpjIzM4kjt1O+6wfNxCvEWrTI1KnY0XPjeRiy+BoZSDfl267Jm7+DgD/wBqTCr3h7jLGH4Xh8Xa159WpHHJ0nsHAd9fJWEKt4VPBpp52LIREVS4REQBERAEREAREQBERAEREAREQBYI2sogNS0H2RrQ0aA7LZEA9vRYLQfZZRRgGhjbrWloytCwHoiY3fwAC7IpXHRGEatYGjQGgtkRCQiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiA/9k=" style="height:60px;width:auto;display:block;margin-bottom:4px;" alt="Signature">
-      <div class="sig-name">R Geraghty</div>
-      <div class="sig-co">Herts Valuations</div>
-    </div>
-    </div>
-    <div class="report-footer">
-      <span class="f-tel">Tel: 01438 716010</span>
-      <span class="f-addr">28 Robbery Bottom Lane, Welwyn, Herts, AL6 0UW</span>
-      <span class="f-small">Herts Valuations Limited &nbsp;&nbsp;Co Reg 04866608</span>
-      <span class="f-small">Founding member of the National Association of Valuers &amp; Auctioneers</span>
-    </div>
-  <div class="page-break-indicator" style="top: 1071px;"></div></div>
-    </div>
-  
-  </div>
+<div style="overflow-y:auto;background:#f0ece3;border-right:1px solid #ddd5c4;height:100%;">
+<div class="tabs">
+<div class="tab active" onclick="switchTab('details')">Client</div>
+<div class="tab" onclick="switchTab('assets')">Assets</div>
+<div class="tab" onclick="switchTab('paragraphs')">Paragraphs</div>
+<div class="tab" onclick="switchTab('variables')">Variables</div>
 </div>
-
+<!-- DETAILS TAB -->
+<div class="tab-content active" id="tab-details">
+<div class="panel-section">
+<h3>Client / IP</h3>
+<label>Firm</label>
+<div class="client-row">
+<select id="firmSelect" onchange="selectFirm()">
+<option value="">— choose firm —</option>
+</select>
+<button class="btn-sm" onclick="openAddClient()">+ Add</button>
+</div>
+<label>Contact</label>
+<select id="contactSelect" onchange="selectContact()" style="margin-bottom:10px">
+<option value="">— choose contact —</option>
+</select>
+<label>Salutation (Dear...)</label>
+<input id="salutation" oninput="updatePreview()" placeholder="" type="text"/>
+<label>Address (one line per row)</label>
+<textarea id="clientAddress" oninput="updatePreview()" placeholder="" rows="4"></textarea>
+<label>Email (if by email only)</label>
+<input id="clientEmail" oninput="updatePreview()" placeholder="" type="text"/>
+</div>
+<div class="panel-section">
+<h3>Case</h3>
+<label>Case / Company Name</label>
+<input id="caseName" oninput="updatePreview()" placeholder="" type="text"/>
+<label>Insolvency Status</label>
+<select id="caseStatus" onchange="updatePreview()">
+<option value="">(none)</option>
+<option value="in Liquidation">in Liquidation</option>
+<option value="in Administration">in Administration</option>
+<option value="in Bankruptcy">in Bankruptcy</option>
+</select>
+<label>Report Date</label>
+<input id="reportDate" oninput="updatePreview()" type="date"/>
+<label>Premises Address</label>
+<input id="premisesAddress" oninput="updatePreview()" placeholder="" type="text"/>
+<label>Site Attendance</label>
+<select id="attendedSite" onchange="updatePreview()">
+<option value="attended">Attended site</option>
+<option value="not">Did not attend site</option>
+</select>
+</div>
+</div>
+<!-- ASSETS TAB -->
+<div class="tab-content" id="tab-assets">
+<div class="panel-section" style="border:none">
+<h3>Asset Categories</h3>
+<div class="highlight-note">Tick to add categories — rows appear below automatically</div>
+<div id="assetCategoryChecks" style="text-align:left;display:block;margin-bottom:12px;"></div>
+<h3>Forced Sale Valuation</h3>
+<table class="asset-table" id="fsTable">
+<thead><tr><th>Category</th><th>£ Value</th><th></th></tr></thead>
+<tbody id="fsBody"></tbody>
+</table>
+<button class="btn-sm" onclick="addAssetRow('fs')">+ Row</button>
+<h3 style="margin-top:20px">Open Market Valuation <span style="font-weight:300;font-size:0.78rem">(optional)</span></h3>
+<label style="margin-bottom:6px"><input id="includeOM" onchange="syncAssetRowsFromCats();renderAssetTables();updatePreview()" type="checkbox"/> Include Open Market valuation</label>
+<table class="asset-table" id="omTable">
+<thead><tr><th>Category</th><th>£ Value</th><th></th></tr></thead>
+<tbody id="omBody"></tbody>
+</table>
+<button class="btn-sm" onclick="addAssetRow('om')">+ Row</button>
+</div>
+</div>
+<!-- PARAGRAPHS TAB -->
+<div class="tab-content" id="tab-paragraphs">
+<div class="panel-section" style="border:none">
+<div class="highlight-note">Click "Add to report" to include a paragraph. In the preview, hover a paragraph and use the ▲▼ arrows to reorder it.</div>
+<div id="paraGroupContainer">
+</div>
+<div class="para-group" style="display:none">
+<div class="para-group-header">
+<div class="para-group-title" contenteditable="true" title="Click to rename this section">Site Visit</div>
+<input class="group-order-input" max="99" min="1" onclick="event.stopPropagation()" oninput="updatePreview()" placeholder="—" title="Position in report" type="number"/>
+</div>
+<div class="para-option" data-id="open1">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Site attended</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">Further to your instructions, we have attended the premises at [ADDRESS] to carry out an inspection and valuation of the company's assets therein, comprising the asset categories chosen. In our opinion, the Forced Sale value of the assets is a figure in the region of [£INSERT], which may be apportioned as follows:</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+<div class="para-option" data-id="open2">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Site not attended</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">Further to your instructions, we are pleased to set out below our valuation of the company's assets situated at [ADDRESS]. These assets comprise the asset categories chosen. In our opinion, the Forced Sale value of the assets is a figure in the region of [£INSERT], which may be apportioned as follows:</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+<div class="para-option" data-id="cs2">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Favour in-situ sale to minimise costs</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">Given the nature of the assets, we would favour a sale in situ, to minimise costs such as transport, removal and storage. No consideration has yet been made of any associated costs of sale.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+</div><div class="para-group" style="display:none">
+<div class="para-group-header">
+<div class="para-group-title" contenteditable="true" title="Click to rename this section">Arriving at valuation</div>
+<input class="group-order-input" max="99" min="1" onclick="event.stopPropagation()" oninput="updatePreview()" placeholder="—" title="Position in report" type="number"/>
+</div>
+<div class="para-option" data-id="arr1">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Standard</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">In arriving at our valuation, we have taken into consideration the age and condition of the assets and present market trends.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+<div class="para-option" data-id="ex2">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Third party goods excluded</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">We have excluded from our valuation certain items which belong to third parties. These are items being sold for customers, or items supplied on a sale or return basis. We are advised that all other items on site are wholly-owned by the company.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+</div><div class="para-group" style="display:none">
+<div class="para-group-header">
+<div class="para-group-title" contenteditable="true" title="Click to rename this section">Disclaimers (standard closing)</div>
+<input class="group-order-input" max="99" min="1" onclick="event.stopPropagation()" oninput="updatePreview()" placeholder="—" title="Position in report" type="number"/>
+</div>
+<div class="para-option" data-id="dis1">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Safety / as-is</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">Although our valuation considers the apparent condition of the assets, neither technical survey nor safety tests have been carried out. In the event of a sale, the assets would be sold 'as is' but we have nevertheless assumed that they generally comply with relevant safety regulations to enable their resale.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+<div class="para-option" data-id="dis2">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Reliance on information</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">Please note that in this report, our opinion is somewhat based on information and statements of fact provided by officers of the company, which have necessarily been relied upon by us to a certain extent. No liability or responsibility can therefore be accepted, where this information is found to be incomplete or incorrect.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+<div class="para-option" data-id="dis4">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">No costs of sale / VAT</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">No costs of sale have been taken into consideration. All valuation figures are exclusive of VAT, if applicable.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+<div class="para-option" data-id="dis3">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Sole use / confidentiality</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">Finally, this report is prepared for the sole use of the party to whom it is addressed and should only be used within the context of the instructions under which it is to be prepared. It may not be disclosed to others without written consent.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+</div>
+<div class="para-group">
+<div class="para-group-header">
+<div class="para-group-title" contenteditable="true" title="Click to rename this section">Offer / Recommendation</div>
+<input class="group-order-input" max="99" min="1" onclick="event.stopPropagation()" oninput="updatePreview()" placeholder="—" title="Position in report" type="number"/>
+</div>
+<div class="para-option" data-id="of_rec1">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Recommend acceptance of offer received</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">We have received an offer from [NAME] in the sum of £[AMOUNT]. We would have no hesitation in recommending acceptance of the offer, especially given the likely Forced Sale value.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+<div class="para-option" data-id="of_rec2">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Recommend private treaty sale</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">Given the particular circumstances of this case, we would suggest that a sale by private treaty would be the best method of realisation in relation to associated costs.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+</div>
+<div class="para-group">
+<div class="para-group-header">
+<div class="para-group-title" contenteditable="true" title="Click to rename this section">Definition</div>
+<input class="group-order-input" max="99" min="1" onclick="event.stopPropagation()" oninput="updatePreview()" placeholder="—" title="Position in report" type="number"/>
+</div>
+<div class="para-option" data-id="fsd1">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Forced Sale</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">A Forced Sale is one in which the assets are sold within a limited period of time, to one or more unconnected third parties with no special interest and does not take into consideration any element of Goodwill or Work in Progress. The physical assets are sold as a whole or individually and although sold without the benefit of any warranty or guarantee, are assumed to be in fair, working condition at the time of sale, unless otherwise stated. Such assets are sold wherever possible in situ.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+<div class="para-option" data-id="fsd2">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Open Market</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">An Open Market valuation is what we would expect to achieve from a well-advertised sale in situ. This valuation assumes the following: a willing seller, that all assets are complete, well maintained and in full working order, that there will be sufficient time to prepare sales details, advertise and conduct a sale, there is easy access for removal and that all items are wholly owned by the company.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+</div>
+<div class="para-group">
+<div class="para-group-header">
+<div class="para-group-title" contenteditable="true" title="Click to rename this section">No / Minimal Assets</div>
+<input class="group-order-input" max="99" min="1" onclick="event.stopPropagation()" oninput="updatePreview()" placeholder="—" title="Position in report" type="number"/>
+</div>
+<div class="para-option" data-id="nil1">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Low value / suggest abandon (office furniture)</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">Unfortunately, given the location of the assets, low demand for used office furniture generally and the high costs of attending site and/or collecting the assets, we would suggest these are abandoned.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+<div class="para-option" data-id="nil2">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Recommend in-situ sale to maximise / minimise expenses</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">We would recommend a sale in situ in order to maximise realisation and minimise expenses.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+</div>
+<div class="para-group">
+<div class="para-group-title" contenteditable="true" title="Click to rename this section">Custom paragraph</div>
+<textarea class="custom-para-input" id="customParaText" placeholder="Type a bespoke paragraph for this case..."></textarea>
+<button class="btn-sm" onclick="addCustomPara()">Add to Report</button>
+</div>
+</div><!-- /paraGroupContainer -->
+<button class="btn-sm" onclick="addNewGroup()" style="margin-top:8px;width:100%;">+ Add New Group</button>
+</div>
+</div>
+<!-- VARIABLES TAB -->
+<div class="tab-content" id="tab-variables">
+<div class="panel-section" style="border:none">
+<div class="highlight-note">These are fixed paragraphs you can tick on per case. They appear in the report only when selected. Edit the title or text directly to fill them in.</div>
+<div class="para-group" id="variablesGroup">
+<div class="para-option" data-id="var1">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Office Furniture &amp; Equipment</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">With regard to the Office Furniture, there is very little demand for used desks and chairs as the labour and transport costs involved in the collection of small quantities are disproportionately high. There is also a steady supply of used items available at low prices.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+<div class="para-option" data-id="var2">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Computer &amp; IT</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">The computer equipment is rather old and with associated costs of data cleansing before sale, these items have a limited resale value.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+<div class="para-option" data-id="var3">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">P&amp;M</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">Click to enter the text for this paragraph...</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+<div class="para-option" data-id="var4">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">Stock</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">We are advised there are a number of suppliers claiming retention of title and once any such claims are received, we shall be happy to advise you further. In the meantime, our valuation has been unable to quantify any such claims.</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+<div class="para-option" data-id="var5">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">MVs</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">Click to enter the text for this paragraph...</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+<div class="para-option" data-id="var6">
+<div class="para-header" onclick="expandPara(this)">
+<span class="tick">✓</span>
+<span class="para-title-text" contenteditable="true" onclick="event.stopPropagation()" ondblclick="event.stopPropagation()" title="Double-click to rename">MVs on Finance</span>
+<span class="rename-hint">✎ rename</span><span class="para-chevron">▼</span>
+</div>
+<div class="para-body">
+<div class="para-preview-text" contenteditable="true" style="cursor:text;outline:none;" title="Click to edit this paragraph text">Click to enter the text for this paragraph...</div>
+<button class="para-add-btn" onclick="selectPara(this.closest('.para-option'))">Add to report</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div style="overflow-y:auto;background:#fdfcf9;display:flex;flex-direction:column;height:100%;">
+<div class="report-toolbar">
+<span>Live preview — paragraphs editable in report; hover a paragraph to reorder with ▲▼</span>
+<button class="btn-action btn-secondary" onclick="window.print()">🖨 Print</button>
+<button class="btn-action btn-secondary" disabled="" id="undoBtn" onclick="doUndo()" title="Undo last change">↶ Undo</button>
+<button class="btn-action btn-secondary" onclick="exportHtml()" style="background:#2a6b3c;color:white;border-color:#2a6b3c;">💾 Export &amp; Save</button>
+<button class="btn-action btn-secondary" onclick="publishToGitHub()" style="background:#24292f;color:white;border-color:#24292f;">⬆ Publish to GitHub</button>
+<button class="btn-action btn-primary" onclick="copyToClipboard()">📋 Copy to Word</button>
+</div>
+<div class="report-scroll">
+<div class="report-page" id="reportPage">
+<!-- populated by JS -->
+</div>
+</div>
+</div>
+</div>
 <!-- COPY FALLBACK MODAL -->
 <div class="modal-bg" id="copyFallbackModal">
-  <div class="modal" style="width:520px">
-    <h3>Copy Report Text</h3>
-    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:12px;">Select all the text below (tap and hold → Select All), then copy and paste into Word.</p>
-    <textarea id="copyFallbackText" style="width:100%;height:260px;font-size:0.78rem;font-family:'Source Serif 4',serif;padding:8px;border:1px solid var(--border);border-radius:4px;resize:none;" readonly=""></textarea>
-    <div class="modal-btns" style="margin-top:12px">
-      <button class="btn-sm" onclick="document.getElementById('copyFallbackModal').classList.remove('open')">Close</button>
-      <button class="btn-sm" style="background:var(--navy);color:white;border-color:var(--navy)" onclick="selectFallbackText()">Select All</button>
-    </div>
-  </div>
+<div class="modal" style="width:520px">
+<h3>Copy Report Text</h3>
+<p style="font-size:0.82rem;color:var(--muted);margin-bottom:12px;">Select all the text below (tap and hold → Select All), then copy and paste into Word.</p>
+<textarea id="copyFallbackText" readonly="" style="width:100%;height:260px;font-size:0.78rem;font-family:'Source Serif 4',serif;padding:8px;border:1px solid var(--border);border-radius:4px;resize:none;"></textarea>
+<div class="modal-btns" style="margin-top:12px">
+<button class="btn-sm" onclick="document.getElementById('copyFallbackModal').classList.remove('open')">Close</button>
+<button class="btn-sm" onclick="selectFallbackText()" style="background:var(--navy);color:white;border-color:var(--navy)">Select All</button>
 </div>
-
+</div>
+</div>
 <!-- ADD FIRM/CONTACT MODAL -->
 <div class="modal-bg" id="addClientModal">
-  <div class="modal">
-    <h3 id="modalTitle">Add New Firm</h3>
-    <div id="modalFirmFields">
-      <label>Firm Name</label>
-      <input type="text" id="newFirmName" placeholder="e.g. Valentine &amp; Co">
-      <label>Firm Address</label>
-      <textarea id="newFirmAddress" rows="4" placeholder="Line 1
+<div class="modal">
+<h3 id="modalTitle">Add New Firm</h3>
+<div id="modalFirmFields">
+<label>Firm Name</label>
+<input id="newFirmName" placeholder="e.g. Valentine &amp; Co" type="text"/>
+<label>Firm Address</label>
+<textarea id="newFirmAddress" placeholder="Line 1
 Line 2
 Town
-Postcode"></textarea>
-    </div>
-    <label>Contact Name (e.g. Mr Reynolds)</label>
-    <input type="text" id="newContactName" placeholder="Mr Reynolds">
-    <label>Contact Title / Qualifications</label>
-    <input type="text" id="newContactTitle" placeholder="M. S. Reynolds Esq. FIPA, FABRP">
-    <label>Email (optional)</label>
-    <input type="text" id="newContactEmail" placeholder="email@firm.com">
-    <div class="modal-btns">
-      <button class="btn-sm" onclick="closeModal()">Cancel</button>
-      <button class="btn-sm btn-primary" style="background:var(--navy);color:white;border-color:var(--navy)" onclick="saveNewEntry()">Save</button>
-    </div>
-  </div>
+Postcode" rows="4"></textarea>
 </div>
-
+<label>Contact Name (e.g. Mr Reynolds)</label>
+<input id="newContactName" placeholder="Mr Reynolds" type="text"/>
+<label>Contact Title / Qualifications</label>
+<input id="newContactTitle" placeholder="M. S. Reynolds Esq. FIPA, FABRP" type="text"/>
+<label>Email (optional)</label>
+<input id="newContactEmail" placeholder="email@firm.com" type="text"/>
+<div class="modal-btns">
+<button class="btn-sm" onclick="closeModal()">Cancel</button>
+<button class="btn-sm btn-primary" onclick="saveNewEntry()" style="background:var(--navy);color:white;border-color:var(--navy)">Save</button>
+</div>
+</div>
+</div>
+<!-- DID YOU ATTEND SITE MODAL -->
+<div class="modal-bg" id="attendSiteModal">
+<div class="modal" style="width:380px;text-align:center;">
+<h3 style="margin-bottom:18px;">Did you attend site?</h3>
+<p style="font-size:0.88rem;color:var(--muted);margin-bottom:22px;line-height:1.5;">Your answer sets the opening paragraph of the report. You can change it later via the Site Attendance setting on the Client tab.</p>
+<div style="display:flex;gap:12px;justify-content:center;">
+<button class="btn-sm btn-primary" style="background:var(--green);color:white;border-color:var(--green);min-width:90px;padding:9px 16px;" onclick="answerAttendSite('attended')">Yes</button>
+<button class="btn-sm" style="background:var(--navy);color:white;border-color:var(--navy);min-width:90px;padding:9px 16px;" onclick="answerAttendSite('not')">No</button>
+</div>
+</div>
+</div>
 <script>
 // ── STATE ──
 const ASSET_CATS = ['Office Furniture & Equipment','Computer & IT Equipment','Fixtures & Fittings','Stock in Trade','Plant & Machinery','Motor Vehicles','Motor Vehicles (Financed)','Leasehold Interest','Intellectual Property','Goodwill'];
@@ -921,7 +950,85 @@ let state = {
   omRows: [],
   assetCats: [],
   customParas: [],
+  selectionOrder: [],
 };
+
+// ── UNDO ──
+const undoStack = [];
+function snapshotParas() {
+  // Capture id, selected state, title and body text of every paragraph option
+  const arr = [];
+  document.querySelectorAll('.para-option').forEach(opt => {
+    const titleEl = opt.querySelector('.para-title-text');
+    const bodyEl = opt.querySelector('.para-preview-text');
+    arr.push({
+      id: opt.dataset.id,
+      selected: opt.classList.contains('selected'),
+      title: titleEl ? titleEl.textContent : '',
+      body: bodyEl ? bodyEl.textContent : ''
+    });
+  });
+  return arr;
+}
+function takeSnapshot() {
+  const fieldIds = ['caseName','caseStatus','reportDate','premisesAddress','attendedSite','salutation','clientAddress','clientEmail','includeOM'];
+  const fields = {};
+  fieldIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    fields[id] = (el.type === 'checkbox') ? el.checked : el.value;
+  });
+  undoStack.push({
+    paras: snapshotParas(),
+    state: JSON.parse(JSON.stringify({
+      fsRows: state.fsRows, omRows: state.omRows, assetCats: state.assetCats,
+      selectionOrder: state.selectionOrder, customParas: state.customParas
+    })),
+    fields
+  });
+  if (undoStack.length > 50) undoStack.shift();
+  updateUndoButton();
+}
+function updateUndoButton() {
+  const btn = document.getElementById('undoBtn');
+  if (btn) btn.disabled = undoStack.length === 0;
+}
+function doUndo() {
+  const snap = undoStack.pop();
+  if (!snap) return;
+  // Restore each paragraph option's selected state, title and body
+  snap.paras.forEach(p => {
+    const opt = document.querySelector(`.para-option[data-id="${p.id}"]`);
+    if (!opt) return;
+    const titleEl = opt.querySelector('.para-title-text');
+    const bodyEl = opt.querySelector('.para-preview-text');
+    if (titleEl) titleEl.textContent = p.title;
+    if (bodyEl) bodyEl.textContent = p.body;
+    const btn = opt.querySelector('.para-add-btn');
+    if (p.selected) {
+      opt.classList.add('selected');
+      if (btn) { btn.textContent = 'Remove'; btn.classList.add('remove'); }
+    } else {
+      opt.classList.remove('selected');
+      if (btn) { btn.textContent = 'Add to report'; btn.classList.remove('remove'); }
+    }
+  });
+  state.fsRows = snap.state.fsRows;
+  state.omRows = snap.state.omRows;
+  state.assetCats = snap.state.assetCats;
+  state.selectionOrder = snap.state.selectionOrder;
+  state.customParas = snap.state.customParas;
+  Object.keys(snap.fields).forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.type === 'checkbox') el.checked = snap.fields[id];
+    else el.value = snap.fields[id];
+  });
+  renderAssetCategoryChecks();
+  renderAssetTables();
+  updateUndoButton();
+  updatePreview();
+}
 
 // ── INIT ──
 window.onload = () => {
@@ -1040,6 +1147,7 @@ function renderAssetCategoryChecks() {
     cb.type = 'checkbox'; cb.value = cat;
     cb.checked = state.assetCats.includes(cat);
     cb.onchange = () => {
+      takeSnapshot();
       if (cb.checked) { if (!state.assetCats.includes(cat)) state.assetCats.push(cat); }
       else state.assetCats = state.assetCats.filter(c => c !== cat);
       syncAssetRowsFromCats();
@@ -1109,11 +1217,13 @@ function updateRow(type, i, field, val) {
   updatePreview();
 }
 function addAssetRow(type) {
+  takeSnapshot();
   const rows = type === 'fs' ? state.fsRows : state.omRows;
   rows.push({cat:'',val:''});
   renderTable(type); updatePreview();
 }
 function delRow(type, i) {
+  takeSnapshot();
   const rows = type === 'fs' ? state.fsRows : state.omRows;
   rows.splice(i,1);
   renderTable(type); updatePreview();
@@ -1131,24 +1241,44 @@ function expandPara(headerEl) {
 }
 
 function selectPara(opt) {
+  takeSnapshot();
   const group = opt.closest('.para-group');
   const btn = opt.querySelector('.para-add-btn');
-  // Deselect any previously selected para in this group
-  group.querySelectorAll('.para-option.selected').forEach(o => {
+  const multiSelect = group && group.id === 'variablesGroup';
+  const pid = opt.dataset.id;
+  // Single-select groups: deselect any previously selected para in this group.
+  // The Variables group allows any combination, so skip this.
+  if (!multiSelect) group.querySelectorAll('.para-option.selected').forEach(o => {
     if (o !== opt) {
       o.classList.remove('selected');
       const b = o.querySelector('.para-add-btn');
       if (b) { b.textContent = 'Add to report'; b.classList.remove('remove'); }
+      state.selectionOrder = state.selectionOrder.filter(id => id !== o.dataset.id);
     }
   });
   // Toggle this one
   if (opt.classList.contains('selected')) {
     opt.classList.remove('selected');
     if (btn) { btn.textContent = 'Add to report'; btn.classList.remove('remove'); }
+    state.selectionOrder = state.selectionOrder.filter(id => id !== pid);
   } else {
     opt.classList.add('selected');
     if (btn) { btn.textContent = 'Remove'; btn.classList.add('remove'); }
+    if (!state.selectionOrder.includes(pid)) state.selectionOrder.push(pid);
   }
+  updatePreview();
+}
+
+// Move a selected paragraph up or down in the report order
+function moveSelected(pid, dir) {
+  takeSnapshot();
+  const i = state.selectionOrder.indexOf(pid);
+  if (i === -1) return;
+  const j = i + dir;
+  if (j < 0 || j >= state.selectionOrder.length) return;
+  const tmp = state.selectionOrder[i];
+  state.selectionOrder[i] = state.selectionOrder[j];
+  state.selectionOrder[j] = tmp;
   updatePreview();
 }
 
@@ -1221,9 +1351,7 @@ const PARA_MAP = {
   gw1: () => `Although there would seem to be little or no value attached to the trading name to any third party without a special interest, we would nevertheless suggest a figure of £[X] is appropriate for the Goodwill and continued use of the trading style and name.`,
   gw2: () => `We have received an offer from the former director of £[X] for the company's Goodwill, which we would recommend acceptance of.`,
   fsd1: () => `A Forced Sale is one in which the assets are sold within a limited period of time, to one or more unconnected third parties with no special interest and does not take into consideration any element of Goodwill or Work in Progress. The physical assets are sold as a whole or individually and although sold without the benefit of any warranty or guarantee, are assumed to be in fair, working condition at the time of sale, unless otherwise stated. Such assets are sold wherever possible in situ.`,
-  fsd2: () => `A Forced Sale valuation is what we would expect to achieve from a well-advertised sale in situ. This valuation assumes: a willing seller; all machines are complete, well maintained and in full working order; sufficient time to prepare sales details, advertise and conduct a sale; easy access for removal; all items are wholly owned by the company; and the list provided is accurate, as we have not had the opportunity to inspect the equipment.`,
-  fsd3: () => `In this case, Open Market values are determined by estimated auction prices, if we were to arrange a well-advertised sale, or series of sales on site. For the purposes of this valuation, however, no account has been made of the cost of sale.`,
-  fsd4: () => `By way of comparison, we would advise that the Forced Sale value of these assets would have been a figure in the region of £[X]. A forced sale assumes a disposal within a limited time period, in a private treaty sale or series of sales on site to trade dealers, or where most of the assets are removed from site for sale elsewhere.`,
+  fsd2: () => `An Open Market valuation is what we would expect to achieve from a well-advertised sale in situ. This valuation assumes the following: a willing seller, that all assets are complete, well maintained and in full working order, that there will be sufficient time to prepare sales details, advertise and conduct a sale, there is easy access for removal and that all items are wholly owned by the company.`,
   ge1: () => `Concerning the Plant & Machinery, used garage equipment can prove difficult to sell, as the price of new imported equipment has decreased significantly in recent years.`,
   ge2: () => `Due to the nature of the assets, it is essential they are sold in situ, as they would be disproportionately expensive to strip down for transportation.`,
   sp1: () => `With regard to the Stock, we are advised this had been run down to low levels during the trading period leading up to the liquidation. We should point out that any stock would of course have been perishable, with a limited shelf life, and with open packs and traceability and warranty issues, disposing of the stock would have proven problematic post liquidation.`,
@@ -1263,6 +1391,10 @@ function addCustomPara() {
   document.getElementById('customParaText').value = '';
   updatePreview();
 }
+
+// ── VARIABLE NOTES (case-specific) ──
+// (Variables are now fixed, toggleable paragraphs in the Variables tab —
+//  selected ones are collected directly in updatePreview.)
 
 
 // ── FORMAT DATE ──
@@ -1345,29 +1477,35 @@ function updatePreview() {
     omIntro = `<p>You have also asked us to express our opinion as to the likely Open Market value of the assets, in situ, and in our opinion such a sale may realise a figure of ${omTotalStr}, which may be apportioned as follows:</p>${omTable}`;
   }
 
-  // Collect selected paragraphs ordered by group number
-  const orderedParas = [];
-  document.querySelectorAll('.para-group').forEach(group => {
-    if (group.style.display === 'none') return;
-    const orderInput = group.querySelector('.group-order-input');
-    if (!orderInput) return;
-    const val = orderInput.value.trim();
-    if (!val || isNaN(val) || parseInt(val) < 1) return;
-    const order = parseInt(val);
-    // Find selected para in this group (has Remove button or selected class)
-    const selected = group.querySelector('.para-option.selected');
-    if (!selected) return;
-    const pid = selected.dataset.id;
-    let text = getParaText(pid);
-    if (text) text = text.replace(/\[£INSERT\]/g, fsTotalStr);
-    if (text) orderedParas.push({ order, text });
+  // Collect selected paragraphs in the order the user added them (state.selectionOrder)
+  const getOptText = (pid) => {
+    try {
+      const opt = document.querySelector(`.para-option[data-id="${pid}"]`);
+      if (!opt || !opt.classList.contains('selected')) return null;
+      let text = getParaText(pid);
+      if (text) text = text.replace(/\[£INSERT\]/g, fsTotalStr);
+      return text || null;
+    } catch(e) { return null; }
+  };
+  // Prune any ids no longer selected (safety)
+  state.selectionOrder = state.selectionOrder.filter(pid => {
+    const opt = document.querySelector(`.para-option[data-id="${pid}"]`);
+    return opt && opt.classList.contains('selected');
   });
-  orderedParas.sort((a, b) => a.order - b.order);
-  const wrapPara = p => `<p contenteditable="true" class="editable-para" style="outline:none;cursor:text;">${p.text}</p>`;
-  // Group 1 sits above the valuation table (it introduces the figures);
-  // groups 2 and onward sit below the table.
-  let parasBeforeTable = orderedParas.filter(p => p.order <= 1).map(wrapPara).join('');
-  let parasAfterTable  = orderedParas.filter(p => p.order >= 2).map(wrapPara).join('');
+  const orderedSelected = state.selectionOrder.slice();
+  const wrapSelPara = (pid, idx, total) => {
+    const text = getOptText(pid);
+    if (!text) return '';
+    const upDis = idx === 0 ? 'disabled' : '';
+    const downDis = idx === total - 1 ? 'disabled' : '';
+    return `<div class="report-para-row">` +
+      `<p contenteditable="true" class="editable-para" style="outline:none;cursor:text;">${text}</p>` +
+      `<span class="para-move-controls" contenteditable="false">` +
+      `<button type="button" class="para-move-btn" ${upDis} onmousedown="event.preventDefault();" onclick="event.stopPropagation();moveSelected('${pid}',-1)" title="Move up">▲</button>` +
+      `<button type="button" class="para-move-btn" ${downDis} onmousedown="event.preventDefault();" onclick="event.stopPropagation();moveSelected('${pid}',1)" title="Move down">▼</button>` +
+      `</span></div>`;
+  };
+  const selectedParasHTML = orderedSelected.map((pid, i) => wrapSelPara(pid, i, orderedSelected.length)).join('');
 
   // ── FIXED OPENING (varies only by site attendance + figures) ──
   const addrVal = document.getElementById('premisesAddress').value || '[PREMISES ADDRESS]';
@@ -1379,6 +1517,17 @@ function updatePreview() {
   const fixedOpening = `<p contenteditable="true" class="editable-para" style="outline:none;cursor:text;">${openingText}</p>`;
   const arrivingText = `In arriving at our valuation, we have taken into consideration the age and condition of the assets and present market trends.`;
   const fixedArriving = `<p contenteditable="true" class="editable-para" style="outline:none;cursor:text;">${arrivingText}</p>`;
+
+  // ── FIXED DISCLAIMERS (always last, in this order) ──
+  const disclaimerTexts = [
+    `Although our valuation considers the apparent condition of the assets, neither technical survey nor safety tests have been carried out. In the event of a sale, the assets would be sold 'as is' but we have nevertheless assumed that they generally comply with relevant safety regulations to enable their resale.`,
+    `No costs of sale have been taken into consideration. All valuation figures are exclusive of VAT, if applicable.`,
+    `Please note that in this report, our opinion is somewhat based on information and statements of fact provided by officers of the company, which have necessarily been relied upon by us to a certain extent. No liability or responsibility can therefore be accepted, where this information is found to be incomplete or incorrect.`,
+    `Finally, this report is prepared for the sole use of the party to whom it is addressed and should only be used within the context of the instructions under which it is to be prepared. It may not be disclosed to others without written consent.`
+  ];
+  const fixedDisclaimers = disclaimerTexts.map(t =>
+    `<p contenteditable="true" class="editable-para" style="outline:none;cursor:text;">${t}</p>`
+  ).join('');
 
   const page = document.getElementById('reportPage');
   page.innerHTML = `
@@ -1398,11 +1547,11 @@ function updatePreview() {
 
     <div class="report-body">
       ${fixedOpening}
-      ${parasBeforeTable}
       ${fsTable}
       ${fixedArriving}
-      ${parasAfterTable}
+      ${selectedParasHTML}
       ${omIntro}
+      ${fixedDisclaimers}
     </div>
 
     <div class="report-closing">
@@ -1427,11 +1576,24 @@ function updatePreview() {
 }
 
 // ── TABS ──
+let _attendSiteAsked = false;
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelector(`[onclick="switchTab('${name}')"]`).classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
+  // First time the Assets tab is opened this session, ask whether site was attended
+  if (name === 'assets' && !_attendSiteAsked) {
+    _attendSiteAsked = true;
+    document.getElementById('attendSiteModal').classList.add('open');
+  }
+}
+
+function answerAttendSite(val) {
+  const sel = document.getElementById('attendedSite');
+  if (sel) sel.value = val;
+  document.getElementById('attendSiteModal').classList.remove('open');
+  updatePreview();
 }
 
 // ── PARAGRAPH MANAGEMENT ──
@@ -1582,12 +1744,25 @@ function updatePageBreaks() {
 }
 
 // ── COPY TO CLIPBOARD ──
-function copyToClipboard() {
+function cleanReportHTML() {
   const page = document.getElementById('reportPage');
+  const clone = page.cloneNode(true);
+  // Remove reorder controls and page-break indicators from the copy
+  clone.querySelectorAll('.para-move-controls, .page-break-indicator').forEach(el => el.remove());
+  // Unwrap report-para-row wrappers so paragraphs sit cleanly
+  clone.querySelectorAll('.report-para-row').forEach(row => {
+    while (row.firstChild) row.parentNode.insertBefore(row.firstChild, row);
+    row.remove();
+  });
+  return clone;
+}
+
+function copyToClipboard() {
+  const clean = cleanReportHTML();
   // Try modern clipboard API first (works on most browsers)
   if (navigator.clipboard && navigator.clipboard.write) {
-    const html = page.innerHTML;
-    const text = page.innerText;
+    const html = clean.innerHTML;
+    const text = clean.innerText;
     try {
       const blob = new Blob([html], { type: 'text/html' });
       const textBlob = new Blob([text], { type: 'text/plain' });
@@ -1597,14 +1772,17 @@ function copyToClipboard() {
       return;
     } catch(e) { /* fall through */ }
   }
-  // Try execCommand (desktop browsers)
+  // Try execCommand (desktop browsers) — temporarily hide controls during copy
   try {
+    const page = document.getElementById('reportPage');
+    page.querySelectorAll('.para-move-controls').forEach(el => el.style.display = 'none');
     const range = document.createRange();
     range.selectNode(page);
     window.getSelection().removeAllRanges();
     window.getSelection().addRange(range);
     const success = document.execCommand('copy');
     window.getSelection().removeAllRanges();
+    page.querySelectorAll('.para-move-controls').forEach(el => el.style.display = '');
     if (success) {
       alert('Report copied to clipboard.\n\nPaste into Word with Ctrl+V (keep source formatting).');
       return;
@@ -1615,8 +1793,7 @@ function copyToClipboard() {
 }
 
 function showFallback() {
-  const page = document.getElementById('reportPage');
-  document.getElementById('copyFallbackText').value = page.innerText;
+  document.getElementById('copyFallbackText').value = cleanReportHTML().innerText;
   document.getElementById('copyFallbackModal').classList.add('open');
 }
 
@@ -1628,7 +1805,5 @@ function selectFallbackText() {
   if (ta.setSelectionRange) ta.setSelectionRange(0, 99999);
 }
 </script>
-
-
-
-</body></html>
+</body>
+</html>
