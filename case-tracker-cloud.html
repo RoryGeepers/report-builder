@@ -113,9 +113,16 @@
   .case-header{padding:18px 24px 14px;border-bottom:1px solid var(--line);flex-shrink:0}
   .ch-top{display:flex;align-items:flex-start;gap:14px}
   .ch-title{flex:1}
-  .ch-title h1{font-family:var(--sans);font-size:23px;font-weight:600;margin-bottom:3px}
-  .ch-firm{color:var(--ink-dim);font-size:13px}
-  .ch-firm .ref{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-left:8px}
+  .ch-title h1{font-family:var(--sans);font-size:23px;font-weight:600;margin-bottom:6px}
+  .ch-meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:2px}
+  .ch-meta-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-dim)}
+  .ch-meta-label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-faint);font-weight:500;white-space:nowrap}
+  .ch-meta-val{color:var(--ink);font-size:12.5px}
+  .ch-meta-val a{color:var(--accent);text-decoration:none}
+  .ch-meta-val a:hover{text-decoration:underline}
+  .ch-meta-sep{width:1px;height:28px;background:var(--line);flex-shrink:0}
+  .ch-dealing{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;
+    padding:2px 9px;border-radius:12px;background:var(--accent-soft);color:var(--accent)}
   .ch-stats{display:flex;gap:20px;margin-top:14px}
   .stat{font-size:12px}
   .stat .num{font-family:var(--mono);font-size:21px;font-weight:600;display:block;line-height:1}
@@ -183,10 +190,20 @@
   .t-due.set{color:var(--ink)}
   .t-repeat-badge{font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:5px;
     background:#e8f0fb;color:#2563a8;border:1px solid #c5d8f0;flex-shrink:0;cursor:default}
-  .t-note{font-size:12px;color:var(--ink-dim);margin-top:5px;white-space:pre-wrap}
-  .t-note[contenteditable]{outline:none;border-radius:4px;padding:2px 4px;margin:3px -4px 0}
-  .t-note[contenteditable]:empty::before{content:"+ add note / log a chase…";color:var(--ink-faint)}
-  .t-note[contenteditable]:focus{background:var(--bg)}
+  .note-log{margin-top:7px;display:flex;flex-direction:column;gap:3px}
+  .note-entry{display:flex;align-items:baseline;gap:6px;font-size:12px;line-height:1.5}
+  .note-tick{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--line);flex-shrink:0;
+    cursor:pointer;position:relative;top:1px;transition:.12s}
+  .note-tick.done-g{background:var(--green);border-color:var(--green)}
+  .note-tick.done-r{background:var(--red);border-color:var(--red)}
+  .note-date{font-size:10px;color:var(--ink-faint);font-family:var(--mono);flex-shrink:0;min-width:42px}
+  .note-text{color:var(--ink-dim);flex:1}
+  .note-text.crossed-g{text-decoration:line-through;color:var(--green)}
+  .note-text.crossed-r{text-decoration:line-through;color:var(--red)}
+  .note-add{font-size:11.5px;color:var(--ink-faint);cursor:text;margin-top:4px;padding:2px 0;
+    outline:none;border:none;background:none;font-family:var(--sans);width:100%;display:block}
+  .note-add:empty::before{content:'+ add note…';pointer-events:none;color:var(--ink-faint)}
+  .note-add:focus{color:var(--ink)}
   .t-del{background:none;border:none;color:var(--ink-faint);cursor:pointer;
     font-size:16px;padding:0 4px;opacity:0;transition:.12s;line-height:1}
   .task:hover .t-del{opacity:1}
@@ -230,6 +247,14 @@
   .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
   .field-row{display:flex;gap:10px}.field-row .field{flex:1}
   .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+  .director-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:6px}
+  .director-row input{font-size:13px}
+  .dir-remove{background:none;border:none;color:var(--ink-faint);font-size:18px;cursor:pointer;
+    padding:0 4px;line-height:1;align-self:center;margin-top:18px}
+  .dir-remove:hover{color:var(--red)}
+  .dir-add-btn{font-size:12px;color:var(--accent);background:none;border:none;cursor:pointer;
+    padding:3px 0;text-align:left;margin-top:2px}
+  .dir-add-btn:hover{text-decoration:underline}
   .template-pick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
   .template-pick label{display:flex;align-items:center;gap:8px;padding:9px 11px;
     background:var(--bg);border:1px solid var(--line);border-radius:8px;cursor:pointer;
@@ -315,6 +340,8 @@
     <button class="btn primary sm" id="newCaseBtn">+ New Case</button>
     <span class="pill" id="whoami" style="margin-left:4px"></span>
     <button class="btn ghost sm hidden" id="settingsBtn" title="Library settings">⚙</button>
+    <button class="btn ghost sm hidden" id="chgPwBtn" title="Change my password">🔑 My password</button>
+    <button class="btn ghost sm hidden" id="elaineePwBtn" title="Reset Elaine's password">🔑 Elaine</button>
     <button class="btn ghost sm" id="logoutBtn" title="Sign out">⇥</button>
   </header>
   <div class="body">
@@ -334,7 +361,7 @@
           <div class="ch-top">
             <div class="ch-title">
               <h1 id="chName"></h1>
-              <div class="ch-firm"><span id="chFirm"></span><span class="ref" id="chRef"></span></div>
+              <div class="ch-meta" id="chMeta"></div>
             </div>
             <button class="icon-btn" id="caseMenuBtn" style="font-size:18px">⋯</button>
           </div>
@@ -397,6 +424,11 @@
       </select></div>
     <div class="field hidden" id="templateField"><label>Start with these tasks (optional)</label>
       <div class="template-pick" id="templatePick"></div>
+    </div>
+    <div class="field">
+      <label>Directors</label>
+      <div id="directorsList"></div>
+      <button type="button" class="dir-add-btn" id="dirAddBtn">+ Add director</button>
     </div>
     <div class="modal-actions">
       <button class="btn ghost" id="cmCancel">Cancel</button>
@@ -464,20 +496,32 @@ function caseToRow(c){return {id:c.id,name:c.name,descr:c.desc||'',firm:c.firm||
   ref:c.ref||'',status:c.status||'active',ctype:c.type||'',created:c.created||Date.now(),
   updated:c.updated||Date.now(),updated_by:me?me.email:'',
   owner:c.owner||'',is_private:!!c.isPrivate,assignee:c.assignee||'',
+  directors:JSON.stringify(c.directors||[]),
   completed_tasks:JSON.stringify(c.completedTasks||[]),
   empty_tasks:JSON.stringify(c.emptyTasks||[])};}
 function rowToCase(r,tasks){let ct=[],et=[];
   try{ct=JSON.parse(r.completed_tasks||'[]');}catch(e){}
   try{et=JSON.parse(r.empty_tasks||'[]');}catch(e){}
+  let dirs=[];try{dirs=JSON.parse(r.directors||'[]');}catch(e){}
   return {id:r.id,name:r.name,desc:r.descr||'',firm:r.firm||'',
   ref:r.ref||'',status:r.status||'active',type:r.ctype||'',created:r.created,updated:r.updated,
   updated_by:r.updated_by||'',owner:r.owner||'',isPrivate:!!r.is_private,assignee:r.assignee||'',
-  completedTasks:ct,emptyTasks:et,tasks:tasks||[]};}
+  directors:dirs,completedTasks:ct,emptyTasks:et,tasks:tasks||[]};}
 function taskToRow(t,caseId,pos){return {id:t.id,case_id:caseId,title:t.title,cat:t.cat||'General',
-  done:!!t.done,due:t.due||'',note:t.note||'',position:pos,updated:Date.now(),updated_by:me?me.email:'',
+  done:!!t.done,due:t.due||'',note:JSON.stringify(t.notes||[]),position:pos,updated:Date.now(),updated_by:me?me.email:'',
   repeat:t.repeat||''};}
-function rowToTask(r){return {id:r.id,title:r.title,cat:r.cat||'General',done:!!r.done,
-  due:r.due||'',note:r.note||'',repeat:r.repeat||''};}
+function rowToTask(r){
+  let notes=[];
+  try{
+    const raw=r.note||'';
+    if(raw.startsWith('[')){
+      const p=JSON.parse(raw);if(Array.isArray(p))notes=p;
+    }else if(raw.trim()){
+      notes=[{id:uid(),date:todayISO(),text:raw,done:false}];
+    }
+  }catch(e){if((r.note||'').trim())notes=[{id:uid(),date:todayISO(),text:r.note,done:false}];}
+  return {id:r.id,title:r.title,cat:r.cat||'General',done:!!r.done,
+    due:r.due||'',notes:notes,repeat:r.repeat||''};}
 
 // Load all cases + tasks from cloud into the in-memory `cases` array
 async function cloudLoadAll(){
@@ -740,8 +784,32 @@ function render(){renderSidebar();
   if(!c){$('#emptyState').classList.remove('hidden');$('#caseView').classList.add('hidden');renderDashboard();return;}
   $('#emptyState').classList.add('hidden');$('#caseView').classList.remove('hidden');
   $('#chName').textContent=c.name;
-  $('#chFirm').textContent=[c.firm,c.type,c.isPrivate?'🔒 Private to you':''].filter(Boolean).join(' · ')||'—';
-  $('#chRef').textContent=c.ref?('Ref '+c.ref):'';
+  // Build meta panel
+  const dealing=c.assignee===RORY_EMAIL?'RG':c.assignee===ELAINE_EMAIL?'EH':'—';
+  const dealingFull=c.assignee===RORY_EMAIL?'Rory Geraghty':c.assignee===ELAINE_EMAIL?'Elaine Hyman':'Unassigned';
+  const dirs=(c.directors||[]).filter(d=>d.name||d.phone||d.email);
+  let metaHTML='';
+  // Client / firm
+  if(c.firm) metaHTML+=`<div class="ch-meta-item"><span class="ch-meta-label">Client</span><span class="ch-meta-val">${esc(c.firm)}</span></div>`;
+  // Case ref
+  if(c.ref) metaHTML+=`<div class="ch-meta-item"><span class="ch-meta-label">Ref</span><span class="ch-meta-val" style="font-family:var(--mono);font-size:11.5px">${esc(c.ref)}</span></div>`;
+  // Type
+  if(c.type) metaHTML+=`<div class="ch-meta-item"><span class="ch-meta-label">Type</span><span class="ch-meta-val">${esc(c.type)}</span></div>`;
+  // Dealing
+  metaHTML+=`<div class="ch-meta-item"><span class="ch-meta-label">Dealing</span><span class="ch-dealing" title="${dealingFull}">${dealing}</span></div>`;
+  // Directors
+  dirs.forEach((d,i)=>{
+    if(i>0) metaHTML+=`<div class="ch-meta-sep"></div>`;
+    let dHTML=`<div class="ch-meta-item" style="flex-wrap:wrap;gap:4px">`;
+    dHTML+=`<span class="ch-meta-label">Director${dirs.length>1?' '+(i+1):''}</span>`;
+    dHTML+=`<span class="ch-meta-val">${esc(d.name)}</span>`;
+    if(d.phone) dHTML+=`<span class="ch-meta-val"><a href="tel:${esc(d.phone)}">${esc(d.phone)}</a></span>`;
+    if(d.email) dHTML+=`<span class="ch-meta-val"><a href="mailto:${esc(d.email)}">${esc(d.email)}</a></span>`;
+    dHTML+=`</div>`;
+    metaHTML+=dHTML;
+  });
+  if(c.isPrivate) metaHTML+=`<div class="ch-meta-item"><span class="ch-meta-val" style="color:var(--ink-faint)">🔒 Private</span></div>`;
+  $('#chMeta').innerHTML=metaHTML;
   // stats
   let total=0,overdue=0,due=0,done=0;
   c.tasks.forEach(t=>{if(t.done){done++;return;}total++;
@@ -807,7 +875,7 @@ function renderTasks(c){
     const inp=add.querySelector('input');
     attachAutocomplete(inp,add.querySelector('.ac-list'),'action');
     inp.onkeydown=e=>{if(e.key==='Enter'&&inp.value.trim()){
-      c.tasks.push({id:uid(),title:inp.value.trim(),cat,done:false,due:'',note:''});
+      c.tasks.push({id:uid(),title:inp.value.trim(),cat,done:false,due:'',notes:[],repeat:''});
       c.emptyTasks=(c.emptyTasks||[]).filter(x=>x!==cat);
       c.updated=Date.now();save(c);render();
       setTimeout(()=>{const inps=document.querySelectorAll('.add-task input');
@@ -848,7 +916,8 @@ function taskRow(c,t,col){
         <div class="t-title" contenteditable spellcheck="false">${esc(t.title)}</div>
         <span class="t-due ${dCls}">${dueLabel(t.due)}</span>${repeatBadge}
       </div>
-      <div class="t-note" contenteditable spellcheck="false">${esc(t.note||'')}</div>
+      <div class="note-log" id="nl_${t.id}"></div>
+      <div class="note-add" contenteditable spellcheck="false"></div>
     </div>
     ${isAdmin()?'<button class="t-del" title="Delete">×</button>':''}`;
   el.querySelector('.t-check').onclick=()=>{
@@ -859,17 +928,53 @@ function taskRow(c,t,col){
       logActivity(c.name,'rolled recurring action',t.title+' → '+t.due);
     } else {
       t.done=!t.done;
-      if(t.done){t.completedAt=todayISO();logActivity(c.name,'completed a task',t.title);}
+      if(t.done){
+        t.completedAt=todayISO();
+        // Mark any unticked notes red
+        (t.notes||[]).forEach(n=>{if(!n.done)n.done='r';});
+        logActivity(c.name,'completed a task',t.title);
+      }
     }
     c.updated=Date.now();save(c);render();
   };
   const title=el.querySelector('.t-title');
   title.onblur=()=>{const v=title.textContent.trim();if(v&&v!==t.title){t.title=v;c.updated=Date.now();save(c);}else if(!v){title.textContent=t.title;}};
   title.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();title.blur();}};
-  const note=el.querySelector('.t-note');
-  note.onblur=()=>{const v=note.textContent;if(v!==(t.note||'')){t.note=v;c.updated=Date.now();save(c);if(v.trim())logActivity(c.name,'updated note on',t.title);}};
   const due=el.querySelector('.t-due');
   due.onclick=e=>{e.stopPropagation();openDuePicker(due,c,t);};
+  function fmtNoteDate(iso){if(!iso)return'';const[y,m,d]=iso.split('-');return d+'/'+m;}
+  function renderNoteLog(){
+    const logEl=el.querySelector('.note-log');if(!logEl)return;
+    const notes=(t.notes||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
+    logEl.innerHTML=notes.map(n=>{
+      const tc=n.done==='g'?'done-g':n.done==='r'?'done-r':'';
+      const tx=n.done==='g'?'crossed-g':n.done==='r'?'crossed-r':'';
+      return '<div class="note-entry" data-nid="'+n.id+'">'
+        +'<div class="note-tick '+tc+'"></div>'
+        +'<span class="note-date">'+fmtNoteDate(n.date)+'</span>'
+        +'<span class="note-text '+tx+'">'+esc(n.text)+'</span>'
+        +'</div>';
+    }).join('');
+    logEl.querySelectorAll('.note-tick').forEach((tick,i)=>{
+      tick.onclick=()=>{
+        const n=notes[i];if(!n||n.done==='r')return;
+        n.done=n.done==='g'?false:'g';
+        c.updated=Date.now();save(c);renderNoteLog();
+      };
+    });
+  }
+  renderNoteLog();
+  const noteAdd=el.querySelector('.note-add');
+  function commitNote(){
+    const txt=noteAdd.textContent.trim();if(!txt)return;
+    if(!t.notes)t.notes=[];
+    t.notes.push({id:uid(),date:todayISO(),text:txt,done:false});
+    noteAdd.textContent='';
+    c.updated=Date.now();save(c);renderNoteLog();
+    logActivity(c.name,'added note to',t.title);
+  }
+  noteAdd.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();commitNote();}};
+  noteAdd.onblur=()=>commitNote();
   const delBtn=el.querySelector('.t-del');
   if(delBtn)delBtn.onclick=()=>{c.tasks=c.tasks.filter(x=>x.id!==t.id);c.updated=Date.now();save(c);render();};
   return el;
@@ -956,6 +1061,44 @@ function maybePromptCompletion(c){
   })(0);
 }
 
+/* ============ Directors helpers ============ */
+function renderDirectorsList(dirs){
+  const list=$('#directorsList');list.innerHTML='';
+  (dirs.length?dirs:[{name:'',phone:'',email:''}]).forEach((d,i)=>{
+    const row=document.createElement('div');row.className='director-row';
+    row.innerHTML=`<div><label style='font-size:11px;color:var(--ink-faint)'>Name</label>`
+      +`<input class='dir-name' value='${esc(d.name||'')}' placeholder='Full name'></div>`
+      +`<div><label style='font-size:11px;color:var(--ink-faint)'>Phone</label>`
+      +`<input class='dir-phone' value='${esc(d.phone||'')}' placeholder='Phone number'></div>`
+      +`<div><label style='font-size:11px;color:var(--ink-faint)'>Email</label>`
+      +`<input class='dir-email' type='email' value='${esc(d.email||'')}' placeholder='Email'></div>`
+      +`<button type='button' class='dir-remove' title='Remove'>×</button>`;
+    row.querySelector('.dir-remove').onclick=()=>{
+      if(list.querySelectorAll('.director-row').length>1)row.remove();
+      else{row.querySelectorAll('input').forEach(i=>i.value='');}
+    };
+    list.appendChild(row);
+  });
+}
+function readDirectors(){
+  return [...$('#directorsList').querySelectorAll('.director-row')].map(row=>({
+    name:row.querySelector('.dir-name').value.trim(),
+    phone:row.querySelector('.dir-phone').value.trim(),
+    email:row.querySelector('.dir-email').value.trim()
+  })).filter(d=>d.name||d.phone||d.email);
+}
+$('#dirAddBtn').onclick=()=>{
+  const list=$('#directorsList');
+  const existing=[...list.querySelectorAll('.director-row')].map(row=>({
+    name:row.querySelector('.dir-name').value.trim(),
+    phone:row.querySelector('.dir-phone').value.trim(),
+    email:row.querySelector('.dir-email').value.trim()
+  }));
+  existing.push({name:'',phone:'',email:''});
+  renderDirectorsList(existing);
+  list.querySelectorAll('.dir-name').last && list.querySelectorAll('.dir-name')[list.querySelectorAll('.dir-name').length-1].focus();
+};
+
 /* ============ Case Modal ============ */
 let editingCase=null;
 function openCaseModal(c){
@@ -968,6 +1111,7 @@ function openCaseModal(c){
   $('#cmType').value=c?c.type||'':'';
   $('#cmAssignee').value=c?c.assignee||'':'';
   $('#templateField').style.display='none';
+  renderDirectorsList(c?c.directors||[]:[{name:'',phone:'',email:''}]);
   $('#caseModal').classList.add('show');
   setTimeout(()=>$('#cmName').focus(),50);
 }
@@ -978,12 +1122,14 @@ $('#cmSave').onclick=async()=>{
     editingCase.name=name;editingCase.firm=$('#cmFirm').value.trim();
     editingCase.ref=$('#cmRef').value.trim();editingCase.status=$('#cmStatus').value;
     editingCase.type=$('#cmType').value;editingCase.assignee=$('#cmAssignee').value;
+    editingCase.directors=readDirectors();
     editingCase.updated=Date.now();
     await cloudSaveCase(editingCase);
   }else{
     const adminCreator=isAdmin();
     const nc={id:uid(),name,firm:$('#cmFirm').value.trim(),ref:$('#cmRef').value.trim(),
-      status:$('#cmStatus').value,type:$('#cmType').value,assignee:$('#cmAssignee').value,tasks:[],
+      status:$('#cmStatus').value,type:$('#cmType').value,assignee:$('#cmAssignee').value,
+      directors:readDirectors(),tasks:[],
       owner:me?me.email:'', isPrivate:adminCreator, // admin's new cases private by default; Elaine's shared
       created:Date.now(),updated:Date.now()};
     cases.push(nc);await cloudSaveCase(nc);activeId=nc.id;
@@ -1176,6 +1322,8 @@ async function startApp(){
     $('#archiveToggle').classList.remove('hidden');
     $('#backupBtn').classList.remove('hidden');
     $('#restoreBtn').classList.remove('hidden');
+    $('#chgPwBtn').classList.remove('hidden');
+    $('#elaineePwBtn').classList.remove('hidden');
   }
   cases=await cloudLoadAll();
   if(cases.length)activeId=cases.sort((a,b)=>(b.updated||0)-(a.updated||0))[0].id;
@@ -1224,6 +1372,25 @@ async function doLogout(){
 }
 
 (async function boot(){
+  // ── TEMPORARY TEST BYPASS ── remove before final upload ──────────────────
+  const BYPASS=false;
+  if(BYPASS){
+    me={email:ADMIN_EMAIL};
+    $('#loginScreen').classList.add('hidden');
+    $('#whoami').textContent='Rory (test)';
+    // Still try to load Supabase for real data
+    await new Promise((res)=>{const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+      s.onload=res;s.onerror=res;document.head.appendChild(s);});
+    if(window.supabase){
+      sb=window.supabase.createClient(SUPA_URL,SUPA_KEY);
+      const {data}=await sb.auth.getSession();
+      if(data.session)me=data.session.user;
+    }
+    await startApp();
+    return;
+  }
+  // ─────────────────────────────────────────────────────────────────────────
   // load supabase client library, then check for an existing session
   await new Promise((res,rej)=>{const s=document.createElement('script');
     s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
@@ -1234,6 +1401,24 @@ async function doLogout(){
   $('#liBtn').onclick=doLogin;
   $('#liPass').onkeydown=e=>{if(e.key==='Enter')doLogin();};
   $('#logoutBtn').onclick=doLogout;
+$('#chgPwBtn').onclick=async()=>{
+  const pw=prompt('Enter your new password (min 8 characters):');
+  if(!pw)return;
+  if(pw.length<8){toast('Password must be at least 8 characters');return;}
+  const pw2=prompt('Confirm new password:');
+  if(pw!==pw2){toast('Passwords do not match');return;}
+  const{error}=await sb.auth.updateUser({password:pw});
+  if(error){toast('Error: '+error.message);}
+  else{toast('Password updated successfully');}
+};
+$('#elaineePwBtn').onclick=async()=>{
+  if(!confirm('This will send Elaine a password reset email.\n\nShe will be prompted to set a new password when she clicks the link.\n\nProceed?'))return;
+  const{error}=await sb.auth.resetPasswordForEmail(ELAINE_EMAIL,{
+    redirectTo:'https://rorygeepers.github.io/report-builder/case-tracker-cloud.html'
+  });
+  if(error){toast('Error: '+error.message);}
+  else{toast('Password reset email sent to Elaine');}
+};
   const {data}=await sb.auth.getSession();
   if(data.session){me=data.session.user;$('#loginScreen').classList.add('hidden');
     $('#whoami').textContent=me.email.split('@')[0];await startApp();}
