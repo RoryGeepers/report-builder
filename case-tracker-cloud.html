@@ -346,7 +346,7 @@
   </header>
   <div class="body">
     <aside class="sidebar">
-      <div class="side-head"><h2>Cases</h2>
+      <div class="side-head"><h2 id="casesHomeBtn" style="cursor:pointer" title="Back to dashboard">Cases</h2>
         <button class="icon-btn hidden" id="archiveToggle" title="Show archived cases">⊟</button>
         <button class="icon-btn" id="newCaseBtn2" title="New case">+</button></div>
       <div class="case-search"><input id="caseSearch" placeholder="Search cases…"></div>
@@ -653,6 +653,7 @@ function firmDotColor(firm){
   }
   return _clientColours[norm];
 }
+let assignFilter=null; // null | RORY_EMAIL | ELAINE_EMAIL | 'unassigned'
 function caseCounts(c){let overdue=0,due=0,open=0;
   c.tasks.forEach(t=>{if(t.done)return;open++;
     const dd=dayDiff(t.due);if(dd!==null){if(dd<0)overdue++;else if(dd<=7)due++;}});
@@ -661,7 +662,23 @@ function renderSidebar(){
   const q=$('#caseSearch').value.toLowerCase();
   const list=$('#caseList');list.innerHTML='';
   let gOver=0,gDue=0;
-  const sorted=[...cases].sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  let sorted=[...cases].sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  if(assignFilter==='unassigned')sorted=sorted.filter(c=>!c.assignee);
+  else if(assignFilter)sorted=sorted.filter(c=>c.assignee===assignFilter);
+  // filter banner
+  let banner=$('#assignFilterBanner');
+  if(assignFilter){
+    if(!banner){
+      banner=document.createElement('div');banner.id='assignFilterBanner';
+      banner.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:7px 12px;'
+        +'background:var(--accent-soft);border-bottom:1px solid var(--line);font-size:11.5px;color:var(--accent)';
+      list.parentNode.insertBefore(banner,list);
+    }
+    const label=assignFilter==='unassigned'?'Unassigned':assigneeName(assignFilter);
+    banner.innerHTML=`<span>Showing: <b>${label}</b> (${sorted.length})</span><span style="cursor:pointer;font-weight:600" id="clearAssignFilter">✕ clear</span>`;
+    banner.style.display='flex';
+    $('#clearAssignFilter').onclick=()=>{assignFilter=null;render();};
+  } else if(banner){banner.style.display='none';}
   sorted.forEach(c=>{
     const archived=c.status==='archived';
     const priv=!!c.isPrivate;
@@ -757,9 +774,9 @@ function renderDashboard(){
       <div class="dash-stat"><div class="ds-num ds-g">${totalActive}</div><div class="ds-lbl">Active</div></div>
     </div>
     <div class="dash-assign-row">
-      <span class="dash-assign-chip dac-r">Rory · ${roryN}</span>
-      <span class="dash-assign-chip dac-e">Elaine · ${elaineN}</span>
-      ${unassignedN?`<span class="dash-assign-chip dac-u">Unassigned · ${unassignedN}</span>`:''}
+      <span class="dash-assign-chip dac-r" id="chipRory" style="cursor:pointer">Rory · ${roryN}</span>
+      <span class="dash-assign-chip dac-e" id="chipElaine" style="cursor:pointer">Elaine · ${elaineN}</span>
+      ${unassignedN?`<span class="dash-assign-chip dac-u" id="chipUnassigned" style="cursor:pointer">Unassigned · ${unassignedN}</span>`:''}
     </div>
     <div class="dash-section">
       <div class="dash-sec-title">Assigned to me</div>
@@ -777,6 +794,12 @@ function renderDashboard(){
   });
   const dashNew=el.querySelector('#dashNewBtn');
   if(dashNew)dashNew.onclick=()=>openCaseModal(null);
+  const chipRory=el.querySelector('#chipRory');
+  if(chipRory)chipRory.onclick=()=>{assignFilter=RORY_EMAIL;render();};
+  const chipElaine=el.querySelector('#chipElaine');
+  if(chipElaine)chipElaine.onclick=()=>{assignFilter=ELAINE_EMAIL;render();};
+  const chipUnassigned=el.querySelector('#chipUnassigned');
+  if(chipUnassigned)chipUnassigned.onclick=()=>{assignFilter='unassigned';render();};
 }
 function activeCase(){return cases.find(c=>c.id===activeId);}
 function render(){renderSidebar();
@@ -1266,6 +1289,7 @@ $('#fileInput').onchange=async e=>{
 
 /* ============ Init ============ */
 $('#newCaseBtn').onclick=$('#newCaseBtn2').onclick=()=>openCaseModal(null);
+$('#casesHomeBtn').onclick=()=>{activeId=null;assignFilter=null;render();};
 $('#caseSearch').oninput=renderSidebar;
 $('#caseModal').onclick=e=>{if(e.target===$('#caseModal'))$('#caseModal').classList.remove('show');};
 
