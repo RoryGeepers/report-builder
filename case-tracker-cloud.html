@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0059)file:///C:/Users/rgera/Downloads/case-tracker-cloud_23.html -->
+<!-- saved from url=(0059)file:///C:/Users/rgera/Downloads/case-tracker-cloud_25.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -208,6 +208,19 @@
     outline:none;border:none;background:none;font-family:var(--sans);width:100%;display:block}
   .note-add:empty::before{content:'+ add note…';pointer-events:none;color:var(--ink-faint)}
   .note-add:focus{color:var(--ink)}
+  .steps-list{margin-top:6px;display:flex;flex-direction:column;gap:3px}
+  .step-entry{display:flex;align-items:center;gap:7px;font-size:12.5px}
+  .step-tick{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--line);flex-shrink:0;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.12s}
+  .step-tick.done{background:var(--green);border-color:var(--green)}
+  .step-text{flex:1;color:var(--ink)}
+  .step-text.done{text-decoration:line-through;color:var(--ink-faint)}
+  .step-del{background:none;border:none;color:var(--ink-faint);font-size:14px;cursor:pointer;padding:0 2px;line-height:1}
+  .step-del:hover{color:var(--red)}
+  .step-add{font-size:11.5px;color:var(--ink-faint);cursor:text;margin-top:4px;padding:2px 0 2px 22px;
+    outline:none;border:none;background:none;font-family:var(--sans);width:100%;display:block}
+  .step-add:empty::before{content:'+ add step…';pointer-events:none;color:var(--ink-faint)}
+  .step-add:focus{color:var(--ink)}
   .t-del{background:none;border:none;color:var(--ink-faint);cursor:pointer;
     font-size:16px;padding:0 4px;opacity:0;transition:.12s;line-height:1}
   .task:hover .t-del{opacity:1}
@@ -350,7 +363,7 @@
       <span class="sub">Task Tracker</span></div>
     <div class="spacer"></div>
     <span class="pill" id="globalOverdue">Overdue <b>16</b></span>
-    <span class="pill" id="globalDue">Due 7d <b>4</b></span>
+    <span class="pill" id="globalDue">Due 7d <b>5</b></span>
     <button class="btn ghost sm" id="backupBtn">⬇ Back up now</button>
     <button class="btn ghost sm" id="restoreBtn">⬆ Restore</button>
     <button class="btn ghost sm" id="exportBtn">⤓ Export</button>
@@ -372,10 +385,10 @@
       <div class="case-list scrollbar" id="caseList"><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">2Hand Ltd - rumage.com</span>
-        <span class="cc-count has-overdue">1 · 1!</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count has-overdue">1 · 1!</span></div></div><div class="case-card active"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">A Dancers World Limited</span>
-        <span class="cc-count ">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">Broadcast Systems Europe Ltd</span>
         <span class="cc-count ">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
@@ -447,7 +460,7 @@
         <span class="cc-count ">3</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">PTL Clothing Limited</span>
-        <span class="cc-count ">2</span></div></div><div class="case-card active"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count ">2</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">Regent Garage (Nfk) Ltd</span>
         <span class="cc-count ">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#cf6f3a"></span>
@@ -490,38 +503,40 @@
         <div class="case-header">
           <div class="ch-top">
             <div class="ch-title">
-              <h1 id="chName">Regent Garage (Nfk) Ltd</h1>
-              <div class="ch-meta" id="chMeta"><div class="ch-meta-item"><span class="ch-meta-label">Client</span><span class="ch-meta-val">Leading Insolvency Practitioners</span></div><div class="ch-meta-item"><span class="ch-meta-label">Type</span><span class="ch-meta-val">CVL</span></div><div class="ch-meta-item"><span class="ch-meta-label">Dealing</span><span class="ch-dealing" title="Rory Geraghty">RG</span></div></div>
+              <h1 id="chName">A Dancers World Limited</h1>
+              <div class="ch-meta" id="chMeta"><div class="ch-meta-item"><span class="ch-meta-label">Client</span><span class="ch-meta-val">Leading Insolvency Practitioners</span></div><div class="ch-meta-item"><span class="ch-meta-label">Ref</span><span class="ch-meta-val" style="font-family:var(--mono);font-size:11.5px">A431</span></div><div class="ch-meta-item"><span class="ch-meta-label">Type</span><span class="ch-meta-val">Liquidation</span></div><div class="ch-meta-item"><span class="ch-meta-label">Dealing</span><span class="ch-dealing" title="Rory Geraghty">RG</span></div><div class="ch-meta-item" style="flex-wrap:wrap;gap:4px"><span class="ch-meta-label">Director</span><span class="ch-meta-val">Sarah Clark</span><span class="ch-meta-val"><a href="tel:07739 743720">07739 743720</a></span><span class="ch-meta-val"><a href="mailto:clarksarahl@googlemail.com">clarksarahl@googlemail.com</a></span></div></div>
             </div>
             <button class="icon-btn" id="caseMenuBtn" style="font-size:18px">⋯</button>
           </div>
           <div class="ch-stats">
             <div class="stat"><span class="num" id="stTotal">1</span><span class="lbl">Open</span></div>
             <div class="stat s-overdue"><span class="num" id="stOverdue">0</span><span class="lbl">Overdue</span></div>
-            <div class="stat s-due"><span class="num" id="stDue">0</span><span class="lbl">Due 7d</span></div>
-            <div class="stat s-done"><span class="num" id="stDone">3</span><span class="lbl">Done</span></div>
+            <div class="stat s-due"><span class="num" id="stDue">1</span><span class="lbl">Due 7d</span></div>
+            <div class="stat s-done"><span class="num" id="stDone">2</span><span class="lbl">Done</span></div>
           </div>
-          <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" id="progFill" style="width: 75%;"></div></div></div>
+          <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" id="progFill" style="width: 67%;"></div></div></div>
         </div>
         <div class="task-area scrollbar" id="taskArea"><div class="task-toolbar"><div class="tt-filter">
       <button data-f="open" class="active">Open</button>
       <button data-f="all" class="">All</button>
       <button data-f="done" class="">Done</button>
     </div>
-    <button class="btn ghost sm" id="addCatBtn">+ Add task</button></div><div class="task-group"><div class="tg-head"><span class="tg-bar" style="background:#7c5cc4"></span>
-      <span class="tg-title ">Send fee note</span>
-      <span class="tg-progress ">0/1</span>
-      </div><div class="tg-body"><div class="task"><div class="t-cat-dot" style="background:#7c5cc4"></div>
+    <button class="btn ghost sm" id="addCatBtn">+ Add task</button></div><div class="task-group"><div class="tg-head"><span class="tg-bar" style="background:#c0392b"></span>
+      <span class="tg-title ">Assets</span>
+      <span class="tg-progress ">1/2</span>
+      </div><div class="tg-body"><div class="task"><div class="t-cat-dot" style="background:#c0392b"></div>
     <div class="t-check "></div>
     <div class="t-body">
       <div class="t-row1">
-        <div class="t-title" contenteditable="" spellcheck="false">Send Fee Note</div>
-        <span class="t-due ">Set date</span><span class="t-assignee-badge " title="Click to assign">+ assign</span>
+        <div class="t-title" contenteditable="" spellcheck="false">Call Sarah</div>
+        <span class="t-due set">5d</span><span class="t-assignee-badge set" title="Elaine">EH</span>
       </div>
-      <div class="note-log" id="nl_mq5l3b3nrva46"><div class="note-entry" data-nid="mquxa9918kxf5"><div class="note-tick "></div><span class="note-date">26/06</span><span class="note-text ">Fee note 1862 sent - check it's paid</span></div></div>
+      <div class="steps-list" id="sl_mquxychkgzaex"></div>
+      <div class="step-add" contenteditable="" spellcheck="false"></div>
+      <div class="note-log" id="nl_mquxychkgzaex"></div>
       <div class="note-add" contenteditable="" spellcheck="false"></div>
     </div>
-    <button class="t-del" title="Delete">×</button></div><div class="add-task" style="position: relative;"><span style="color:#7c5cc4">＋</span><input placeholder="Add action to Send fee note…" autocomplete="off"><div class="ac-list"></div></div></div></div></div>
+    <button class="t-del" title="Delete">×</button></div><div class="add-task" style="position: relative;"><span style="color:#c0392b">＋</span><input placeholder="Add action to Assets…" autocomplete="off"><div class="ac-list"></div></div></div></div></div>
       </div>
     </main>
   </div>
@@ -678,7 +693,7 @@ function rowToCase(r,tasks){let ct=[],et=[];
   directors:dirs,completedTasks:ct,emptyTasks:et,tasks:tasks||[]};}
 function taskToRow(t,caseId,pos){return {id:t.id,case_id:caseId,title:t.title,cat:t.cat||'General',
   done:!!t.done,due:t.due||'',note:JSON.stringify(t.notes||[]),position:pos,updated:Date.now(),updated_by:me?me.email:'',
-  repeat:t.repeat||'',task_assignee:t.assignee||''};}
+  repeat:t.repeat||'',task_assignee:t.assignee||'',steps:JSON.stringify(t.steps||[])};}
 function rowToTask(r){
   let notes=[];
   try{
@@ -689,8 +704,9 @@ function rowToTask(r){
       notes=[{id:uid(),date:todayISO(),text:raw,done:false}];
     }
   }catch(e){if((r.note||'').trim())notes=[{id:uid(),date:todayISO(),text:r.note,done:false}];}
+  let steps=[];try{steps=JSON.parse(r.steps||'[]');if(!Array.isArray(steps))steps=[];}catch(e){}
   return {id:r.id,title:r.title,cat:r.cat||'General',done:!!r.done,
-    due:r.due||'',notes:notes,repeat:r.repeat||'',assignee:r.task_assignee||''};}
+    due:r.due||'',notes:notes,repeat:r.repeat||'',assignee:r.task_assignee||'',steps:steps};}
 
 // Load all cases + tasks from cloud into the in-memory `cases` array
 async function cloudLoadAll(){
@@ -1146,6 +1162,8 @@ function taskRow(c,t,col){
         <div class="t-title" contenteditable spellcheck="false">${esc(t.title)}</div>
         <span class="t-due ${dCls}">${dueLabel(t.due)}</span>${repeatBadge}${assigneeBadge}
       </div>
+      <div class="steps-list" id="sl_${t.id}"></div>
+      <div class="step-add" contenteditable spellcheck="false"></div>
       <div class="note-log" id="nl_${t.id}"></div>
       <div class="note-add" contenteditable spellcheck="false"></div>
     </div>
@@ -1160,6 +1178,10 @@ function taskRow(c,t,col){
     c.updated=Date.now();save(c);render();
   };
   el.querySelector('.t-check').onclick=()=>{
+    if(!t.done && (t.steps||[]).some(s=>!s.done)){
+      toast('⚠ Complete all steps first');
+      return;
+    }
     if(!t.done && t.repeat){
       // Recurring: roll due date forward, stay undone
       t.due=rollDueDate(t.due||todayISO(),t.repeat);
@@ -1181,6 +1203,42 @@ function taskRow(c,t,col){
   title.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();title.blur();}};
   const due=el.querySelector('.t-due');
   due.onclick=e=>{e.stopPropagation();openDuePicker(due,c,t);};
+  function renderSteps(){
+    const slEl=el.querySelector('.steps-list');if(!slEl)return;
+    const steps=t.steps||[];
+    slEl.innerHTML=steps.map(s=>{
+      return '<div class="step-entry" data-sid="'+s.id+'">'
+        +'<div class="step-tick'+(s.done?' done':'')+'">'+(s.done?'<svg viewBox="0 0 16 16" width="10" height="10"><path d="M3 8l3.5 3.5L13 4.5" stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>':'')+'</div>'
+        +'<span class="step-text'+(s.done?' done':'')+'">'+esc(s.text)+'</span>'
+        +(isAdmin()?'<button class="step-del" title="Remove step">×</button>':'')
+        +'</div>';
+    }).join('');
+    slEl.querySelectorAll('.step-tick').forEach((tick,i)=>{
+      tick.onclick=()=>{
+        steps[i].done=!steps[i].done;
+        c.updated=Date.now();save(c);renderSteps();
+        logActivity(c.name,steps[i].done?'completed step on':'reopened step on',t.title+' → '+steps[i].text);
+      };
+    });
+    slEl.querySelectorAll('.step-del').forEach((btn,i)=>{
+      btn.onclick=()=>{
+        t.steps=steps.filter((_,idx)=>idx!==i);
+        c.updated=Date.now();save(c);renderSteps();
+      };
+    });
+  }
+  renderSteps();
+  const stepAdd=el.querySelector('.step-add');
+  function commitStep(){
+    const txt=stepAdd.textContent.trim();if(!txt)return;
+    if(!t.steps)t.steps=[];
+    t.steps.push({id:uid(),text:txt,done:false});
+    stepAdd.textContent='';
+    c.updated=Date.now();save(c);renderSteps();
+    logActivity(c.name,'added step to',t.title+' → '+txt);
+  }
+  stepAdd.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();commitStep();}};
+  stepAdd.onblur=()=>commitStep();
   function fmtNoteDate(iso){if(!iso)return'';const[y,m,d]=iso.split('-');return d+'/'+m;}
   function renderNoteLog(){
     const logEl=el.querySelector('.note-log');if(!logEl)return;
