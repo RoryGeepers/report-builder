@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0059)file:///C:/Users/rgera/Downloads/case-tracker-cloud_25.html -->
+<!-- saved from url=(0059)file:///C:/Users/rgera/Downloads/case-tracker-cloud_29.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -273,10 +273,21 @@
   .al-action{color:var(--ink-dim)}
   .al-case{font-weight:600;color:var(--ink)}
   .al-empty{color:var(--ink-faint);font-size:13px;padding:20px 0;text-align:center}
-  .al-session-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
-  .al-session-card{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
-  .al-session-num{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--ink)}
-  .al-session-lbl{font-size:9.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--ink-faint);margin-top:2px}
+  .al-tabs{display:flex;gap:4px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+  .al-tab{background:none;border:none;font-size:12.5px;font-weight:500;color:var(--ink-faint);
+    padding:7px 12px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .al-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+  .al-tab:hover:not(.active){color:var(--ink-dim)}
+  .al-period-nav{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:12px}
+  .al-period-nav span{font-size:13px;font-weight:600;color:var(--ink);min-width:170px;text-align:center}
+  .al-person-table{width:100%;border-collapse:collapse;margin-bottom:18px;font-size:12.5px}
+  .al-person-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.8px;
+    color:var(--ink-faint);font-weight:600;padding:0 10px 7px;border-bottom:1px solid var(--line)}
+  .al-person-table td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  .al-person-table tr:last-child td{border-bottom:none}
+  .al-person-name{font-weight:600;color:var(--ink)}
+  .al-person-table td{font-family:var(--mono);font-size:13px;color:var(--ink)}
+  .al-active-sub{display:block;font-family:var(--sans);font-size:10.5px;color:var(--ink-faint);margin-top:1px}
   .al-day-stats{font-size:10.5px;color:var(--ink-faint);font-family:var(--mono);margin-left:auto}
   .director-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:6px}
   .director-row input{font-size:13px}
@@ -362,8 +373,8 @@
     <div class="brand">Case Desk<span class="dot">.</span>
       <span class="sub">Task Tracker</span></div>
     <div class="spacer"></div>
-    <span class="pill" id="globalOverdue">Overdue <b>16</b></span>
-    <span class="pill" id="globalDue">Due 7d <b>5</b></span>
+    <span class="pill" id="globalOverdue">Overdue <b>3</b></span>
+    <span class="pill" id="globalDue">Due 7d <b>27</b></span>
     <button class="btn ghost sm" id="backupBtn">⬇ Back up now</button>
     <button class="btn ghost sm" id="restoreBtn">⬆ Restore</button>
     <button class="btn ghost sm" id="exportBtn">⤓ Export</button>
@@ -394,13 +405,13 @@
         <span class="cc-count ">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">Brushes UK Ltd</span>
-        <span class="cc-count ">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:var(--ink-faint)"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:var(--ink-faint)"></span>
         
         <span class="cc-name-text">Cables -Ex Smart AV Distribution Ltd</span>
         <span class="cc-count ">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">Chordata Limited</span>
-        <span class="cc-count ">6</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count has-due">4</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">Clifford Event Management Ltd</span>
         <span class="cc-count ">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#7c3aed"></span>
@@ -409,40 +420,40 @@
         <span class="cc-count has-overdue">1 · 1!</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">Fryer Fitness Ltd</span>
-        <span class="cc-count ">2</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">GBCM Limited</span>
-        <span class="cc-count has-overdue">1 · 1!</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">Gingerbread Cottage Haircutters Limited</span>
-        <span class="cc-count ">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Hire Genius Limited</span>
         <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
+        <span class="cc-name-text">Hire Genius Limited</span>
+        <span class="cc-count has-due">2</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
+        <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">Holborn Studios Ltd</span>
-        <span class="cc-count has-overdue">7 · 3!</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
+        <span class="cc-count has-due">3</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">Howards Construction Ltd</span>
-        <span class="cc-count has-overdue">1 · 1!</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">Injectd Ltd</span>
-        <span class="cc-count has-overdue">1 · 1!</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">Jux</span>
-        <span class="cc-count has-overdue">1 · 1!</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">Klear Labs Ltd</span>
-        <span class="cc-count ">2</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count ">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">Kleio Audio Limited</span>
         <span class="cc-count has-overdue">1 · 1!</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">Lyndon Pallett Group Limited</span>
-        <span class="cc-count ">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">Main Source Ltd</span>
-        <span class="cc-count has-overdue">2 · 2!</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">Mayflower Electrical Limited</span>
         <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
@@ -451,34 +462,34 @@
         <span class="cc-count ">0</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
         
         <span class="cc-name-text">PAQ Services Ltd</span>
-        <span class="cc-count has-overdue">1 · 1!</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">Phoenix Pet Supplies Ltd</span>
         <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">Pier Consultancy Limited</span>
-        <span class="cc-count ">3</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">PTL Clothing Limited</span>
-        <span class="cc-count ">2</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">Regent Garage (Nfk) Ltd</span>
         <span class="cc-count ">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#cf6f3a"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">Rise and Vine</span>
-        <span class="cc-count ">0</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">Rotoflex Print and Packaging Limited</span>
-        <span class="cc-count ">2</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
+        <span class="cc-count ">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">Shape House Ltd</span>
-        <span class="cc-count ">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
         
         <span class="cc-name-text">Skye New Oceans Ltd</span>
-        <span class="cc-count ">2</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
+        <span class="cc-count ">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
         
         <span class="cc-name-text">Smile Like Me Ltd</span>
-        <span class="cc-count ">2</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#c96a10"></span>
+        <span class="cc-count ">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#c96a10"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">Stewart Grice</span>
         <span class="cc-count ">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
@@ -487,13 +498,13 @@
         <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">Tamasha Limited</span>
-        <span class="cc-count has-overdue">1 · 1!</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
+        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">The College of Osteopaths</span>
-        <span class="cc-count has-overdue">3 · 1!</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#b45309"></span>
+        <span class="cc-count has-due">2</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#b45309"></span>
         <span class="cc-lock" title="Private to you">🔒</span>
         <span class="cc-name-text">Wines of the Weald Ltd</span>
-        <span class="cc-count has-overdue">1 · 1!</span></div></div></div>
+        <span class="cc-count has-due">1</span></div></div></div>
     </aside>
     <main class="main">
       <div class="empty-state hidden" id="emptyState">
@@ -512,31 +523,31 @@
             <div class="stat"><span class="num" id="stTotal">1</span><span class="lbl">Open</span></div>
             <div class="stat s-overdue"><span class="num" id="stOverdue">0</span><span class="lbl">Overdue</span></div>
             <div class="stat s-due"><span class="num" id="stDue">1</span><span class="lbl">Due 7d</span></div>
-            <div class="stat s-done"><span class="num" id="stDone">2</span><span class="lbl">Done</span></div>
+            <div class="stat s-done"><span class="num" id="stDone">0</span><span class="lbl">Done</span></div>
           </div>
-          <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" id="progFill" style="width: 67%;"></div></div></div>
+          <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div></div>
         </div>
         <div class="task-area scrollbar" id="taskArea"><div class="task-toolbar"><div class="tt-filter">
       <button data-f="open" class="active">Open</button>
       <button data-f="all" class="">All</button>
       <button data-f="done" class="">Done</button>
     </div>
-    <button class="btn ghost sm" id="addCatBtn">+ Add task</button></div><div class="task-group"><div class="tg-head"><span class="tg-bar" style="background:#c0392b"></span>
-      <span class="tg-title ">Assets</span>
-      <span class="tg-progress ">1/2</span>
-      </div><div class="tg-body"><div class="task"><div class="t-cat-dot" style="background:#c0392b"></div>
+    <button class="btn ghost sm" id="addCatBtn">+ Add task</button></div><div class="task-group"><div class="tg-head"><span class="tg-bar" style="background:#2563a8"></span>
+      <span class="tg-title ">Sell stock</span>
+      <span class="tg-progress ">0/1</span>
+      </div><div class="tg-body"><div class="task"><div class="t-cat-dot" style="background:#2563a8"></div>
     <div class="t-check "></div>
     <div class="t-body">
       <div class="t-row1">
-        <div class="t-title" contenteditable="" spellcheck="false">Call Sarah</div>
-        <span class="t-due set">5d</span><span class="t-assignee-badge set" title="Elaine">EH</span>
+        <div class="t-title" contenteditable="" spellcheck="false">Peacocks to collect June 30th. Check all went well</div>
+        <span class="t-due set">3d</span><span class="t-assignee-badge set" title="Rory">RG</span>
       </div>
-      <div class="steps-list" id="sl_mquxychkgzaex"></div>
+      <div class="steps-list" id="sl_mqv26ax6qbsrq"><div class="step-entry" data-sid="mqwl7og754jrs"><div class="step-tick"></div><span class="step-text">Discuss options with Ben. Sarah to give list of trade contacts for marketing</span><button class="step-del" title="Remove step">×</button></div></div>
       <div class="step-add" contenteditable="" spellcheck="false"></div>
-      <div class="note-log" id="nl_mquxychkgzaex"></div>
+      <div class="note-log" id="nl_mqv26ax6qbsrq"></div>
       <div class="note-add" contenteditable="" spellcheck="false"></div>
     </div>
-    <button class="t-del" title="Delete">×</button></div><div class="add-task" style="position: relative;"><span style="color:#c0392b">＋</span><input placeholder="Add action to Assets…" autocomplete="off"><div class="ac-list"></div></div></div></div></div>
+    <button class="t-del" title="Delete">×</button></div><div class="add-task" style="position: relative;"><span style="color:#2563a8">＋</span><input placeholder="Add action to Sell stock…" autocomplete="off"><div class="ac-list"></div></div></div></div></div>
       </div>
     </main>
   </div>
@@ -643,8 +654,18 @@
       </select>
       <button class="btn ghost sm" id="alRefresh" style="margin-left:auto">↻ Refresh</button>
     </div>
+    <div class="al-tabs">
+      <button class="al-tab active" data-period="day">Today</button>
+      <button class="al-tab" data-period="week">This Week</button>
+      <button class="al-tab" data-period="month">This Month</button>
+    </div>
+    <div class="al-period-nav">
+      <button class="icon-btn" id="alPrevPeriod" title="Previous">‹</button>
+      <span id="alPeriodLabel">Today</span>
+      <button class="icon-btn" id="alNextPeriod" title="Next">›</button>
+    </div>
     <div id="alSessionSummary"></div>
-    <div id="activityLogBody" class="scrollbar" style="max-height:48vh;overflow-y:auto"></div>
+    <div id="activityLogBody" class="scrollbar" style="max-height:42vh;overflow-y:auto"></div>
     <div class="modal-actions">
       <button class="btn ghost" id="activityLogClose">Close</button>
     </div>
@@ -1473,12 +1494,52 @@ function openSettings(){renderLibLists();$('#settingsModal').classList.add('show
 $('#settingsBtn').onclick=openSettings;
 
 /* ============ Activity Log (admin only) ============ */
+let alPeriodType='day'; // 'day' | 'week' | 'month'
+let alPeriodOffset=0;   // 0 = current, -1 = previous, -2 = two back, etc.
 function fmtDuration(ms){
   if(!ms||ms<0)ms=0;
   const totalMin=Math.round(ms/60000);
   const h=Math.floor(totalMin/60),m=totalMin%60;
   if(h===0)return m+'m';
   return h+'h '+m+'m';
+}
+function startOfDay(d){const dt=new Date(d);dt.setHours(0,0,0,0);return dt.getTime();}
+function startOfWeek(d){
+  const dt=new Date(d);const day=dt.getDay();
+  const diff=(day===0?-6:1)-day; // Monday as start of week
+  dt.setDate(dt.getDate()+diff);dt.setHours(0,0,0,0);
+  return dt.getTime();
+}
+function startOfMonth(d){
+  const dt=new Date(d);dt.setDate(1);dt.setHours(0,0,0,0);
+  return dt.getTime();
+}
+function getPeriodRange(){
+  const now=new Date();
+  if(alPeriodType==='day'){
+    const base=new Date(startOfDay(now));
+    base.setDate(base.getDate()+alPeriodOffset);
+    const start=base.getTime();
+    const end=new Date(start);end.setDate(end.getDate()+1);
+    const label=base.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    return {start,end:end.getTime(),label:(alPeriodOffset===0?'Today — ':'')+label};
+  }
+  if(alPeriodType==='week'){
+    const base=new Date(startOfWeek(now));
+    base.setDate(base.getDate()+alPeriodOffset*7);
+    const start=base.getTime();
+    const end=new Date(start);end.setDate(end.getDate()+7);
+    const endDisp=new Date(end.getTime()-1);
+    const label=base.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' – '+endDisp.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    return {start,end:end.getTime(),label:(alPeriodOffset===0?'This Week: ':'')+label};
+  }
+  // month
+  const base=new Date(startOfMonth(now));
+  base.setMonth(base.getMonth()+alPeriodOffset);
+  const start=base.getTime();
+  const end=new Date(start);end.setMonth(end.getMonth()+1);
+  const label=base.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  return {start,end:end.getTime(),label:(alPeriodOffset===0?'This Month: ':'')+label};
 }
 async function loadActivityLog(){
   const who=$('#alFilterWho').value;
@@ -1487,36 +1548,53 @@ async function loadActivityLog(){
   body.innerHTML='<div class="al-empty">Loading…</div>';
   summaryEl.innerHTML='';
 
-  // ── Sessions: running totals + per-day breakdown ──────────────────────────
-  let sq=sb.from('sessions').select('*').order('started_at',{ascending:false}).limit(1000);
+  const {start,end,label}=getPeriodRange();
+  $('#alPeriodLabel').textContent=label;
+  // disable "next" beyond current period
+  $('#alNextPeriod').disabled=(alPeriodOffset>=0);
+  $('#alNextPeriod').style.opacity=(alPeriodOffset>=0)?'.35':'1';
+
+  // ── Sessions within this period ────────────────────────────────────────────
+  let sq=sb.from('sessions').select('*').gte('started_at',start).lt('started_at',end).order('started_at',{ascending:false}).limit(2000);
   if(who)sq=sq.eq('who',who);
   const {data:sessions,error:sErr}=await sq;
+
+  const perPerson={}; // email -> {session,active}
   const dayTimeMap={}; // dayKey -> {sessionMs, activeMs}
-  let totalSessionMs=0,totalActiveMs=0;
   if(!sErr&&sessions){
     sessions.forEach(s=>{
-      const end=s.ended_at||s.last_seen||s.started_at;
-      const sessMs=Math.max(0,end-s.started_at);
-      const actMs=Math.min(s.active_ms||0,sessMs); // never exceed session length
-      totalSessionMs+=sessMs;totalActiveMs+=actMs;
+      const sEnd=s.ended_at||s.last_seen||s.started_at;
+      const sessMs=Math.max(0,sEnd-s.started_at);
+      const actMs=Math.min(s.active_ms||0,sessMs);
+      if(!perPerson[s.who])perPerson[s.who]={session:0,active:0};
+      perPerson[s.who].session+=sessMs;perPerson[s.who].active+=actMs;
       const dayKey=new Date(s.started_at).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
       if(!dayTimeMap[dayKey])dayTimeMap[dayKey]={sessionMs:0,activeMs:0};
       dayTimeMap[dayKey].sessionMs+=sessMs;
       dayTimeMap[dayKey].activeMs+=actMs;
     });
   }
-  summaryEl.innerHTML=`<div class="al-session-grid">
-    <div class="al-session-card"><div class="al-session-num">${fmtDuration(totalSessionMs)}</div><div class="al-session-lbl">Total time online</div></div>
-    <div class="al-session-card"><div class="al-session-num">${fmtDuration(totalActiveMs)}</div><div class="al-session-lbl">Total active time</div></div>
-    <div class="al-session-card"><div class="al-session-num">${sessions?sessions.length:0}</div><div class="al-session-lbl">Sessions logged</div></div>
-  </div>`;
 
-  // ── Activity entries grouped by day, with per-day time stats ─────────────
-  let q=sb.from('activity').select('*').order('at',{ascending:false}).limit(500);
+  const peopleToShow=who?[who]:[RORY_EMAIL,ELAINE_EMAIL];
+  const tableRows=peopleToShow.map(email=>{
+    const p=perPerson[email]||{session:0,active:0};
+    return `<tr>
+      <td class="al-person-name">${esc(assigneeName(email))}</td>
+      <td>${fmtDuration(p.session)}</td>
+      <td><span class="al-active-sub" style="display:inline">${fmtDuration(p.active)}</span></td>
+    </tr>`;
+  }).join('');
+  summaryEl.innerHTML=`<table class="al-person-table">
+    <thead><tr><th>Person</th><th>Online</th><th>Active</th></tr></thead>
+    <tbody>${tableRows}</tbody>
+  </table>`;
+
+  // ── Activity entries within this period, grouped by day ──────────────────
+  let q=sb.from('activity').select('*').gte('at',start).lt('at',end).order('at',{ascending:false}).limit(500);
   if(who)q=q.eq('who',who);
   const {data,error}=await q;
   if(error){body.innerHTML='<div class="al-empty">Could not load activity log.</div>';return;}
-  if(!data||!data.length){body.innerHTML='<div class="al-empty">No activity recorded yet.</div>';return;}
+  if(!data||!data.length){body.innerHTML='<div class="al-empty">No activity recorded in this period.</div>';return;}
   const groups={};
   data.forEach(r=>{
     const d=new Date(r.at);
@@ -1537,12 +1615,26 @@ async function loadActivityLog(){
     return `<div class="al-day"><div class="al-day-head" style="display:flex;align-items:baseline">${day}${statsHTML}</div>${rows}</div>`;
   }).join('');
 }
-function openActivityLog(){$('#activityLogModal').classList.add('show');loadActivityLog();}
+function openActivityLog(){
+  alPeriodType='day';alPeriodOffset=0;
+  document.querySelectorAll('.al-tab').forEach(t=>t.classList.toggle('active',t.dataset.period==='day'));
+  $('#activityLogModal').classList.add('show');loadActivityLog();
+}
 $('#activityLogBtn').onclick=openActivityLog;
 $('#activityLogClose').onclick=()=>$('#activityLogModal').classList.remove('show');
 $('#activityLogModal').onclick=e=>{if(e.target===$('#activityLogModal'))$('#activityLogModal').classList.remove('show');};
 $('#alRefresh').onclick=loadActivityLog;
 $('#alFilterWho').onchange=loadActivityLog;
+document.querySelectorAll('.al-tab').forEach(tab=>{
+  tab.onclick=()=>{
+    document.querySelectorAll('.al-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    alPeriodType=tab.dataset.period;alPeriodOffset=0;
+    loadActivityLog();
+  };
+});
+$('#alPrevPeriod').onclick=()=>{alPeriodOffset--;loadActivityLog();};
+$('#alNextPeriod').onclick=()=>{if(alPeriodOffset<0){alPeriodOffset++;loadActivityLog();}};
 $('#archiveToggle').onclick=()=>{showArchive=!showArchive;
   $('#archiveToggle').classList.toggle('on',showArchive);
   $('#archiveToggle').title=showArchive?'Hide archived cases':'Show archived cases';
@@ -1695,6 +1787,7 @@ async function startApp(){
     $('#chgPwBtn').classList.remove('hidden');
     $('#elaineePwBtn').classList.remove('hidden');
     $('#activityLogBtn').classList.remove('hidden');
+    $('#exportBtn').classList.remove('hidden');
   }
   cases=await cloudLoadAll();
   if(cases.length)activeId=cases.sort((a,b)=>(b.updated||0)-(a.updated||0))[0].id;
