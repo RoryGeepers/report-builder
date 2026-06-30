@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- saved from url=(0059)file:///C:/Users/rgera/Downloads/case-tracker-cloud_29.html -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="en">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Case Desk — Task Tracker</title>
 <style>
@@ -56,6 +56,11 @@
     border-radius:8px;color:var(--ink);font-size:13px;
   }
   .case-search input:focus{outline:none;border-color:var(--accent)}
+  .case-tabs{display:flex;gap:2px;margin:0 12px 8px;background:var(--panel-2);border-radius:8px;padding:2px}
+  .case-tab{flex:1;font-size:11.5px;font-weight:500;padding:6px 4px;border:none;background:none;
+    color:var(--ink-faint);cursor:pointer;border-radius:6px;transition:.12s}
+  .case-tab.active{background:var(--panel);color:var(--accent);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+  .case-tab:hover:not(.active){color:var(--ink-dim)}
   .case-list{flex:1;overflow-y:auto;padding:0 8px 12px}
   .case-card{
     padding:11px 12px;border-radius:9px;cursor:pointer;margin-bottom:5px;
@@ -89,9 +94,11 @@
   .empty-state{flex:1;overflow-y:auto;background:var(--bg)}
   .dash-greeting{font-size:20px;font-weight:600;color:var(--ink);margin-bottom:3px}
   .dash-sub{font-size:13px;color:var(--ink-dim);margin-bottom:20px}
-  .dash-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
-  .dash-stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
-  .dash-stat .ds-num{font-family:var(--mono);font-size:24px;font-weight:600;line-height:1;color:var(--ink)}
+  .dash-stat-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+  .dash-stat{background:var(--panel);border:1px solid var(--line);border-radius:20px;
+    padding:4px 12px;display:flex;align-items:center;gap:5px}
+  .dash-stat .ds-num{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink)}
+  .dash-stat .ds-lbl{font-size:12px;color:var(--ink-dim)}
   .ds-r{color:var(--red)} .ds-a{color:var(--amber)} .ds-g{color:var(--green)}
   .dash-section{margin-bottom:20px}
   .dash-sec-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;
@@ -289,6 +296,17 @@
   .al-person-table td{font-family:var(--mono);font-size:13px;color:var(--ink)}
   .al-active-sub{display:block;font-family:var(--sans);font-size:10.5px;color:var(--ink-faint);margin-top:1px}
   .al-day-stats{font-size:10.5px;color:var(--ink-faint);font-family:var(--mono);margin-left:auto}
+  .al-ms-month{margin-bottom:18px}
+  .al-ms-month-title{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:8px}
+  .al-ms-row{display:flex;align-items:center;gap:10px;margin-bottom:5px}
+  .al-ms-name{font-size:11.5px;color:var(--ink-dim);width:46px;flex-shrink:0}
+  .al-ms-bar-track{flex:1;height:16px;background:var(--panel-2);border-radius:4px;overflow:hidden;position:relative}
+  .al-ms-bar-fill{height:100%;border-radius:4px;transition:width .3s}
+  .al-ms-bar-fill.rory{background:#0f766e}
+  .al-ms-bar-fill.elaine{background:#2563a8}
+  .al-ms-val{font-family:var(--mono);font-size:11px;color:var(--ink);width:78px;text-align:right;flex-shrink:0}
+  .al-ms-legend{display:flex;gap:16px;font-size:11px;color:var(--ink-faint);margin-bottom:14px}
+  .al-ms-legend-dot{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:middle}
   .director-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;margin-bottom:6px}
   .director-row input{font-size:13px}
   .dir-remove{background:none;border:none;color:var(--ink-faint);font-size:18px;cursor:pointer;
@@ -356,7 +374,7 @@
   .login-box input:focus{outline:none;border-color:var(--accent)}
   .login-error{color:var(--red);font-size:12.5px;text-align:center;min-height:16px}
 </style>
-<script src="./case-tracker-cloud_files/supabase-js@2"></script></head>
+</head>
 <body>
 <div class="login-screen hidden" id="loginScreen">
   <div class="login-box">
@@ -373,181 +391,55 @@
     <div class="brand">Case Desk<span class="dot">.</span>
       <span class="sub">Task Tracker</span></div>
     <div class="spacer"></div>
-    <span class="pill" id="globalOverdue">Overdue <b>3</b></span>
-    <span class="pill" id="globalDue">Due 7d <b>27</b></span>
-    <button class="btn ghost sm" id="backupBtn">⬇ Back up now</button>
-    <button class="btn ghost sm" id="restoreBtn">⬆ Restore</button>
-    <button class="btn ghost sm" id="exportBtn">⤓ Export</button>
+    <span class="pill" id="globalOverdue">Overdue <b>0</b></span>
+    <span class="pill" id="globalDue">Due 7d <b>0</b></span>
+    <button class="btn ghost sm hidden" id="backupBtn">⬇ Back up now</button>
+    <button class="btn ghost sm hidden" id="restoreBtn">⬆ Restore</button>
+    <button class="btn ghost sm hidden" id="exportBtn">⤓ Export</button>
     <button class="btn ghost sm" id="importBtn">⤒ Import</button>
     <button class="btn primary sm" id="newCaseBtn">+ New Case</button>
-    <span class="pill" id="whoami" style="margin-left:4px">rgeraghty</span>
-    <button class="btn ghost sm" id="settingsBtn" title="Library settings">⚙</button>
-    <button class="btn ghost sm" id="activityLogBtn" title="Activity log">📋</button>
-    <button class="btn ghost sm" id="chgPwBtn" title="Change my password">🔑 My password</button>
-    <button class="btn ghost sm" id="elaineePwBtn" title="Reset Elaine&#39;s password">🔑 Elaine</button>
+
+    <span class="pill" id="whoami" style="margin-left:4px"></span>
+    <button class="btn ghost sm hidden" id="settingsBtn" title="Library settings">⚙</button>
+    <button class="btn ghost sm hidden" id="activityLogBtn" title="Activity log">📋</button>
+    <button class="btn ghost sm hidden" id="chgPwBtn" title="Change my password">🔑 My password</button>
+    <button class="btn ghost sm hidden" id="elaineePwBtn" title="Reset Elaine's password">🔑 Elaine</button>
     <button class="btn ghost sm" id="logoutBtn" title="Sign out">⇥</button>
   </header>
   <div class="body">
     <aside class="sidebar">
       <div class="side-head"><h2 id="casesHomeBtn" style="cursor:pointer" title="Back to dashboard">Cases</h2>
-        <button class="icon-btn" id="archiveToggle" title="Show archived cases">⊟</button>
         <button class="icon-btn" id="newCaseBtn2" title="New case">+</button></div>
       <div class="case-search"><input id="caseSearch" placeholder="Search cases…"></div>
-      <div class="case-list scrollbar" id="caseList"><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">2Hand Ltd - rumage.com</span>
-        <span class="cc-count has-overdue">1 · 1!</span></div></div><div class="case-card active"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        
-        <span class="cc-name-text">A Dancers World Limited</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        
-        <span class="cc-name-text">Broadcast Systems Europe Ltd</span>
-        <span class="cc-count ">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Brushes UK Ltd</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:var(--ink-faint)"></span>
-        
-        <span class="cc-name-text">Cables -Ex Smart AV Distribution Ltd</span>
-        <span class="cc-count ">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        
-        <span class="cc-name-text">Chordata Limited</span>
-        <span class="cc-count has-due">4</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Clifford Event Management Ltd</span>
-        <span class="cc-count ">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#7c3aed"></span>
-        
-        <span class="cc-name-text">Design Asylum Retail (UK) Limited</span>
-        <span class="cc-count has-overdue">1 · 1!</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        
-        <span class="cc-name-text">Fryer Fitness Ltd</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">GBCM Limited</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        
-        <span class="cc-name-text">Gingerbread Cottage Haircutters Limited</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Hire Genius Limited</span>
-        <span class="cc-count has-due">2</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Holborn Studios Ltd</span>
-        <span class="cc-count has-due">3</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Howards Construction Ltd</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        
-        <span class="cc-name-text">Injectd Ltd</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Jux</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        
-        <span class="cc-name-text">Klear Labs Ltd</span>
-        <span class="cc-count ">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        
-        <span class="cc-name-text">Kleio Audio Limited</span>
-        <span class="cc-count has-overdue">1 · 1!</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Lyndon Pallett Group Limited</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        
-        <span class="cc-name-text">Main Source Ltd</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Mayflower Electrical Limited</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Packaging Supplies limited</span>
-        <span class="cc-count ">0</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
-        
-        <span class="cc-name-text">PAQ Services Ltd</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Phoenix Pet Supplies Ltd</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        
-        <span class="cc-name-text">Pier Consultancy Limited</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        
-        <span class="cc-name-text">PTL Clothing Limited</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        
-        <span class="cc-name-text">Regent Garage (Nfk) Ltd</span>
-        <span class="cc-count ">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#cf6f3a"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Rise and Vine</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Rotoflex Print and Packaging Limited</span>
-        <span class="cc-count ">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Shape House Ltd</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#15803d"></span>
-        
-        <span class="cc-name-text">Skye New Oceans Ltd</span>
-        <span class="cc-count ">1</span></div></div><div class="case-card"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
-        
-        <span class="cc-name-text">Smile Like Me Ltd</span>
-        <span class="cc-count ">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#c96a10"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Stewart Grice</span>
-        <span class="cc-count ">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Sunrise Online Retail Limited</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Tamasha Limited</span>
-        <span class="cc-count has-due">1</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#d4537e"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">The College of Osteopaths</span>
-        <span class="cc-count has-due">2</span></div></div><div class="case-card private"><div class="cc-name"><span class="status-dot" style="background:#b45309"></span>
-        <span class="cc-lock" title="Private to you">🔒</span>
-        <span class="cc-name-text">Wines of the Weald Ltd</span>
-        <span class="cc-count has-due">1</span></div></div></div>
+      <div class="case-tabs">
+        <button class="case-tab active" data-tab="active">Active</button>
+        <button class="case-tab" data-tab="onhold">On Hold</button>
+        <button class="case-tab hidden" id="archivedTabBtn" data-tab="archived">Archived</button>
+      </div>
+      <div class="case-list scrollbar" id="caseList"></div>
     </aside>
     <main class="main">
-      <div class="empty-state hidden" id="emptyState">
+      <div class="empty-state" id="emptyState">
         <div id="dashboardContent" style="padding:24px 28px;max-width:720px"></div>
       </div>
-      <div class="" id="caseView" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
+      <div class="hidden" id="caseView" style="display:flex;flex-direction:column;flex:1;overflow:hidden">
         <div class="case-header">
           <div class="ch-top">
             <div class="ch-title">
-              <h1 id="chName">A Dancers World Limited</h1>
-              <div class="ch-meta" id="chMeta"><div class="ch-meta-item"><span class="ch-meta-label">Client</span><span class="ch-meta-val">Leading Insolvency Practitioners</span></div><div class="ch-meta-item"><span class="ch-meta-label">Ref</span><span class="ch-meta-val" style="font-family:var(--mono);font-size:11.5px">A431</span></div><div class="ch-meta-item"><span class="ch-meta-label">Type</span><span class="ch-meta-val">Liquidation</span></div><div class="ch-meta-item"><span class="ch-meta-label">Dealing</span><span class="ch-dealing" title="Rory Geraghty">RG</span></div><div class="ch-meta-item" style="flex-wrap:wrap;gap:4px"><span class="ch-meta-label">Director</span><span class="ch-meta-val">Sarah Clark</span><span class="ch-meta-val"><a href="tel:07739 743720">07739 743720</a></span><span class="ch-meta-val"><a href="mailto:clarksarahl@googlemail.com">clarksarahl@googlemail.com</a></span></div></div>
+              <h1 id="chName"></h1>
+              <div class="ch-meta" id="chMeta"></div>
             </div>
             <button class="icon-btn" id="caseMenuBtn" style="font-size:18px">⋯</button>
           </div>
           <div class="ch-stats">
-            <div class="stat"><span class="num" id="stTotal">1</span><span class="lbl">Open</span></div>
+            <div class="stat"><span class="num" id="stTotal">0</span><span class="lbl">Open</span></div>
             <div class="stat s-overdue"><span class="num" id="stOverdue">0</span><span class="lbl">Overdue</span></div>
-            <div class="stat s-due"><span class="num" id="stDue">1</span><span class="lbl">Due 7d</span></div>
+            <div class="stat s-due"><span class="num" id="stDue">0</span><span class="lbl">Due 7d</span></div>
             <div class="stat s-done"><span class="num" id="stDone">0</span><span class="lbl">Done</span></div>
           </div>
           <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div></div>
         </div>
-        <div class="task-area scrollbar" id="taskArea"><div class="task-toolbar"><div class="tt-filter">
-      <button data-f="open" class="active">Open</button>
-      <button data-f="all" class="">All</button>
-      <button data-f="done" class="">Done</button>
-    </div>
-    <button class="btn ghost sm" id="addCatBtn">+ Add task</button></div><div class="task-group"><div class="tg-head"><span class="tg-bar" style="background:#2563a8"></span>
-      <span class="tg-title ">Sell stock</span>
-      <span class="tg-progress ">0/1</span>
-      </div><div class="tg-body"><div class="task"><div class="t-cat-dot" style="background:#2563a8"></div>
-    <div class="t-check "></div>
-    <div class="t-body">
-      <div class="t-row1">
-        <div class="t-title" contenteditable="" spellcheck="false">Peacocks to collect June 30th. Check all went well</div>
-        <span class="t-due set">3d</span><span class="t-assignee-badge set" title="Rory">RG</span>
-      </div>
-      <div class="steps-list" id="sl_mqv26ax6qbsrq"><div class="step-entry" data-sid="mqwl7og754jrs"><div class="step-tick"></div><span class="step-text">Discuss options with Ben. Sarah to give list of trade contacts for marketing</span><button class="step-del" title="Remove step">×</button></div></div>
-      <div class="step-add" contenteditable="" spellcheck="false"></div>
-      <div class="note-log" id="nl_mqv26ax6qbsrq"></div>
-      <div class="note-add" contenteditable="" spellcheck="false"></div>
-    </div>
-    <button class="t-del" title="Delete">×</button></div><div class="add-task" style="position: relative;"><span style="color:#2563a8">＋</span><input placeholder="Add action to Sell stock…" autocomplete="off"><div class="ac-list"></div></div></div></div></div>
+        <div class="task-area scrollbar" id="taskArea"></div>
       </div>
     </main>
   </div>
@@ -561,7 +453,7 @@
       <input id="cmName" placeholder="e.g. Holborn Studios Ltd"></div>
     <div class="field-row">
       <div class="field"><label>Insolvency Practitioner / Firm</label>
-        <input id="cmFirm" placeholder="e.g. Valentine &amp; Co" list="firmList">
+        <input id="cmFirm" placeholder="e.g. Valentine & Co" list="firmList">
         <datalist id="firmList">
           <option>Valentine &amp; Co (London)</option>
           <option>Valentine &amp; Co (Dartford)</option>
@@ -658,19 +550,22 @@
       <button class="al-tab active" data-period="day">Today</button>
       <button class="al-tab" data-period="week">This Week</button>
       <button class="al-tab" data-period="month">This Month</button>
+      <button class="al-tab" data-period="summary">Monthly Summary</button>
     </div>
-    <div class="al-period-nav">
+    <div class="al-period-nav" id="alPeriodNavWrap">
       <button class="icon-btn" id="alPrevPeriod" title="Previous">‹</button>
       <span id="alPeriodLabel">Today</span>
       <button class="icon-btn" id="alNextPeriod" title="Next">›</button>
     </div>
     <div id="alSessionSummary"></div>
+    <div id="alMonthlySummary" class="hidden"></div>
     <div id="activityLogBody" class="scrollbar" style="max-height:42vh;overflow-y:auto"></div>
     <div class="modal-actions">
       <button class="btn ghost" id="activityLogClose">Close</button>
     </div>
   </div>
 </div>
+
 <div class="modal-bg" id="elementModal">
   <div class="modal">
     <h3>Add a task</h3>
@@ -765,7 +660,7 @@ async function logActivity(caseName,action,detail){
 
 /* ============ State ============ */
 let cases=[],activeId=null,filter='open';
-let showArchive=false;
+let caseTab='active'; // 'active' | 'onhold' | 'archived'
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 
 /* ============ Tasks start from scratch — no templates ============ */
@@ -885,14 +780,18 @@ function renderSidebar(){
     banner.style.display='flex';
     $('#clearAssignFilter').onclick=()=>{assignFilter=null;render();};
   } else if(banner){banner.style.display='none';}
+  // Filter by current tab: active (everything not onhold/archived), onhold, or archived
+  sorted=sorted.filter(c=>{
+    if(caseTab==='archived')return c.status==='archived';
+    if(caseTab==='onhold')return c.status==='onhold';
+    return c.status!=='archived' && c.status!=='onhold';
+  });
   sorted.forEach(c=>{
     const archived=c.status==='archived';
     const priv=!!c.isPrivate;
     const lockedOut=priv && !isAdmin();
-    // global counters: skip archived and cases locked to Elaine
-    if(!archived && !lockedOut){const cc0=caseCounts(c);gOver+=cc0.overdue;gDue+=cc0.due;}
-    // hide archived unless admin has archive view on
-    if(archived && !(isAdmin() && showArchive))return;
+    // global counters: only count cases in the active tab (skip onhold, archived, locked)
+    if(!archived && c.status!=='onhold' && !lockedOut){const cc0=caseCounts(c);gOver+=cc0.overdue;gDue+=cc0.due;}
     const cc=caseCounts(c);
     if(q&&!(c.name.toLowerCase().includes(q)||(c.firm||'').toLowerCase().includes(q)))return;
     const el=document.createElement('div');
@@ -910,6 +809,12 @@ function renderSidebar(){
   });
   $('#globalOverdue').innerHTML='Overdue <b>'+gOver+'</b>';
   $('#globalDue').innerHTML='Due 7d <b>'+gDue+'</b>';
+  // tab counts
+  const activeCount=cases.filter(c=>c.status!=='archived'&&c.status!=='onhold'&&(isAdmin()||!c.isPrivate)).length;
+  const onholdCount=cases.filter(c=>c.status==='onhold'&&(isAdmin()||!c.isPrivate)).length;
+  document.querySelector('.case-tab[data-tab="active"]').textContent='Active'+(activeCount?' '+activeCount:'');
+  document.querySelector('.case-tab[data-tab="onhold"]').textContent='On Hold'+(onholdCount?' '+onholdCount:'');
+  if(isAdmin())$('#archivedTabBtn').classList.remove('hidden');
 }
 function esc(s){return(s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 
@@ -940,9 +845,10 @@ function renderDashboard(){
     const cc=caseCounts(c);totalOverdue+=cc.overdue;totalDue+=cc.due;
   });
   // assignee counts
-  const roryN=visible.filter(c=>c.assignee===RORY_EMAIL).length;
-  const elaineN=visible.filter(c=>c.assignee===ELAINE_EMAIL).length;
-  const unassignedN=visible.filter(c=>!c.assignee).length;
+  const activeOnly=visible.filter(c=>c.status!=='onhold');
+  const roryN=activeOnly.filter(c=>c.assignee===RORY_EMAIL).length;
+  const elaineN=activeOnly.filter(c=>c.assignee===ELAINE_EMAIL).length;
+  const unassignedN=activeOnly.filter(c=>!c.assignee).length;
   // my cases (assigned to current user), sorted: overdue first
   const myCases=visible.filter(c=>c.assignee===me?.email);
   myCases.sort((a,b)=>{const ca=caseCounts(a),cb=caseCounts(b);
@@ -989,14 +895,14 @@ function renderDashboard(){
     <div class="dash-greeting">${greeting}</div>
     <div class="dash-sub">${dateStr}</div>
     <div class="dash-stat-grid">
-      <div class="dash-stat"><div class="ds-num">${totalCases}</div><div class="ds-lbl">Cases</div></div>
-      <div class="dash-stat"><div class="ds-num ds-r">${totalOverdue}</div><div class="ds-lbl">Overdue</div></div>
-      <div class="dash-stat"><div class="ds-num ds-a">${totalDue}</div><div class="ds-lbl">Due 7 days</div></div>
-      <div class="dash-stat"><div class="ds-num ds-g">${totalActive}</div><div class="ds-lbl">Active</div></div>
+      <div class="dash-stat"><span class="ds-num">${totalCases}</span><span class="ds-lbl">Cases</span></div>
+      <div class="dash-stat"><span class="ds-num ds-r">${totalOverdue}</span><span class="ds-lbl">Overdue</span></div>
+      <div class="dash-stat"><span class="ds-num ds-a">${totalDue}</span><span class="ds-lbl">Due 7 days</span></div>
+      <div class="dash-stat"><span class="ds-num ds-g">${totalActive}</span><span class="ds-lbl">Active</span></div>
     </div>
     <div class="dash-assign-row">
-      <span class="dash-assign-chip dac-r" id="chipRory" style="cursor:pointer">Rory · ${roryN}</span>
-      <span class="dash-assign-chip dac-e" id="chipElaine" style="cursor:pointer">Elaine · ${elaineN}</span>
+      <span class="dash-assign-chip dac-r" id="chipRory" style="cursor:pointer">Rory active · ${roryN}</span>
+      <span class="dash-assign-chip dac-e" id="chipElaine" style="cursor:pointer">Elaine active · ${elaineN}</span>
       ${unassignedN?`<span class="dash-assign-chip dac-u" id="chipUnassigned" style="cursor:pointer">Unassigned · ${unassignedN}</span>`:''}
     </div>
     <div class="dash-section">
@@ -1618,28 +1524,92 @@ async function loadActivityLog(){
 function openActivityLog(){
   alPeriodType='day';alPeriodOffset=0;
   document.querySelectorAll('.al-tab').forEach(t=>t.classList.toggle('active',t.dataset.period==='day'));
+  showPeriodView();
   $('#activityLogModal').classList.add('show');loadActivityLog();
+}
+function showPeriodView(){
+  $('#alPeriodNavWrap').classList.remove('hidden');
+  $('#alSessionSummary').classList.remove('hidden');
+  $('#activityLogBody').classList.remove('hidden');
+  $('#alMonthlySummary').classList.add('hidden');
+}
+function showSummaryView(){
+  $('#alPeriodNavWrap').classList.add('hidden');
+  $('#alSessionSummary').classList.add('hidden');
+  $('#activityLogBody').classList.add('hidden');
+  $('#alMonthlySummary').classList.remove('hidden');
+}
+async function loadMonthlySummary(){
+  const el=$('#alMonthlySummary');
+  el.innerHTML='<div class="al-empty">Loading…</div>';
+  const who=$('#alFilterWho').value;
+  const MONTHS_BACK=6;
+  const now=new Date();
+  const months=[];
+  for(let i=0;i<MONTHS_BACK;i++){
+    const base=new Date(startOfMonth(now));base.setMonth(base.getMonth()-i);
+    const start=base.getTime();
+    const end=new Date(start);end.setMonth(end.getMonth()+1);
+    months.push({start,end:end.getTime(),label:base.toLocaleDateString('en-GB',{month:'long',year:'numeric'})});
+  }
+  let sq=sb.from('sessions').select('*').gte('started_at',months[months.length-1].start).order('started_at',{ascending:false}).limit(5000);
+  if(who)sq=sq.eq('who',who);
+  const {data:sessions,error}=await sq;
+  if(error){el.innerHTML='<div class="al-empty">Could not load summary.</div>';return;}
+  const people=who?[who]:[RORY_EMAIL,ELAINE_EMAIL];
+  // aggregate active ms per month per person
+  const agg={}; // monthLabel -> email -> activeMs
+  months.forEach(m=>agg[m.label]={});
+  (sessions||[]).forEach(s=>{
+    const sEnd=s.ended_at||s.last_seen||s.started_at;
+    const sessMs=Math.max(0,sEnd-s.started_at);
+    const actMs=Math.min(s.active_ms||0,sessMs);
+    const m=months.find(mm=>s.started_at>=mm.start&&s.started_at<mm.end);
+    if(!m)return;
+    agg[m.label][s.who]=(agg[m.label][s.who]||0)+actMs;
+  });
+  const maxMs=Math.max(1,...months.flatMap(m=>people.map(p=>agg[m.label][p]||0)));
+  const colorClass=email=>email===RORY_EMAIL?'rory':'elaine';
+  el.innerHTML=`<div class="al-ms-legend">
+      ${people.map(p=>`<span><span class="al-ms-legend-dot" style="background:${p===RORY_EMAIL?'#0f766e':'#2563a8'}"></span>${esc(assigneeName(p))}</span>`).join('')}
+    </div>`
+    +months.map(m=>{
+      const rows=people.map(p=>{
+        const ms=agg[m.label][p]||0;
+        const pct=Math.round((ms/maxMs)*100);
+        return `<div class="al-ms-row">
+          <span class="al-ms-name">${esc(assigneeName(p))}</span>
+          <div class="al-ms-bar-track"><div class="al-ms-bar-fill ${colorClass(p)}" style="width:${pct}%"></div></div>
+          <span class="al-ms-val">${fmtDuration(ms)}</span>
+        </div>`;
+      }).join('');
+      return `<div class="al-ms-month"><div class="al-ms-month-title">${m.label}</div>${rows}</div>`;
+    }).join('');
 }
 $('#activityLogBtn').onclick=openActivityLog;
 $('#activityLogClose').onclick=()=>$('#activityLogModal').classList.remove('show');
 $('#activityLogModal').onclick=e=>{if(e.target===$('#activityLogModal'))$('#activityLogModal').classList.remove('show');};
-$('#alRefresh').onclick=loadActivityLog;
-$('#alFilterWho').onchange=loadActivityLog;
+$('#alRefresh').onclick=()=>{if(alPeriodType==='summary')loadMonthlySummary();else loadActivityLog();};
+$('#alFilterWho').onchange=()=>{if(alPeriodType==='summary')loadMonthlySummary();else loadActivityLog();};
 document.querySelectorAll('.al-tab').forEach(tab=>{
   tab.onclick=()=>{
     document.querySelectorAll('.al-tab').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
     alPeriodType=tab.dataset.period;alPeriodOffset=0;
-    loadActivityLog();
+    if(alPeriodType==='summary'){showSummaryView();loadMonthlySummary();}
+    else{showPeriodView();loadActivityLog();}
   };
 });
 $('#alPrevPeriod').onclick=()=>{alPeriodOffset--;loadActivityLog();};
 $('#alNextPeriod').onclick=()=>{if(alPeriodOffset<0){alPeriodOffset++;loadActivityLog();}};
-$('#archiveToggle').onclick=()=>{showArchive=!showArchive;
-  $('#archiveToggle').classList.toggle('on',showArchive);
-  $('#archiveToggle').title=showArchive?'Hide archived cases':'Show archived cases';
-  renderSidebar();
-  toast(showArchive?'Showing archived cases':'Archive hidden');};
+document.querySelectorAll('.case-tab').forEach(tab=>{
+  tab.onclick=()=>{
+    document.querySelectorAll('.case-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    caseTab=tab.dataset.tab;
+    renderSidebar();
+  };
+});
 $('#settingsClose').onclick=()=>$('#settingsModal').classList.remove('show');
 $('#settingsModal').onclick=e=>{if(e.target===$('#settingsModal'))$('#settingsModal').classList.remove('show');};
 $('#libTaskAdd').onclick=async()=>{const v=$('#libTaskInput').value;if(v.trim()){await libraryAdd('task',v);$('#libTaskInput').value='';renderLibLists();}};
@@ -1727,7 +1697,9 @@ $('#fileInput').onchange=async e=>{
 
 /* ============ Init ============ */
 $('#newCaseBtn').onclick=$('#newCaseBtn2').onclick=()=>openCaseModal(null);
-$('#casesHomeBtn').onclick=()=>{activeId=null;assignFilter=null;render();};
+$('#casesHomeBtn').onclick=()=>{activeId=null;assignFilter=null;caseTab='active';
+  document.querySelectorAll('.case-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab==='active'));
+  render();};
 $('#caseSearch').oninput=renderSidebar;
 $('#caseModal').onclick=e=>{if(e.target===$('#caseModal'))$('#caseModal').classList.remove('show');};
 
@@ -1781,7 +1753,6 @@ async function startApp(){
   await loadLibrary();
   if(isAdmin()){
     $('#settingsBtn').classList.remove('hidden');
-    $('#archiveToggle').classList.remove('hidden');
     $('#backupBtn').classList.remove('hidden');
     $('#restoreBtn').classList.remove('hidden');
     $('#chgPwBtn').classList.remove('hidden');
@@ -1931,6 +1902,5 @@ $('#elaineePwBtn').onclick=async()=>{
   else $('#loginScreen').classList.remove('hidden');
 })();
 </script>
-
-
-</body></html>
+</body>
+</html>
